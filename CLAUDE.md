@@ -11,7 +11,7 @@ Application mobile AI "life planner" (iOS + Android) — React Native Expo + Nod
 
 ## Stack
 
-- **Frontend** : React Native + Expo SDK 55, Expo Router, Reanimated v4, Zustand
+- **Frontend** : React Native 0.81 + Expo SDK 54, Expo Router v6, Reanimated v4, Zustand v5
 - **Backend** : Node.js 22 + TypeScript + Fastify 5 (monolithe unique)
 - **Base de données** : PostgreSQL via Supabase (Auth, RLS, Storage)
 - **IA** : Claude API (Anthropic) — Sonnet 4.6, tool calling, prompt caching
