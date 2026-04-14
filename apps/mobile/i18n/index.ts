@@ -7,7 +7,7 @@ import { de } from './de';
 const translations: Record<Language, Record<string, string>> = { fr, en, es, de };
 
 export function useTranslation() {
-  const language = useLanguageStore((s) => s.language) ?? 'fr';
+  const language = useLanguageStore((s) => s.language);
   const strings = translations[language];
 
   function t(key: string): string {

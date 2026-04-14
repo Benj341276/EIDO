@@ -14,7 +14,6 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 export default function RootLayout() {
   const colors = useColors();
   const themeMode = useThemeStore((s) => s.mode);
-  const language = useLanguageStore((s) => s.language);
   const langHydrated = useLanguageStore((s) => s._hydrated);
   const { isAuthenticated, isLoading: authLoading, initialize: initAuth } = useAuthStore();
   const { hasCompletedOnboarding, isLoading: prefsLoading, loadPreferences } = usePreferencesStore();
@@ -43,17 +42,14 @@ export default function RootLayout() {
     SplashScreen.hideAsync().catch(() => {});
 
     const currentRoute = segments[0] ?? '';
-
     let target = '';
 
-    if (!language) {
-      if (currentRoute !== 'language-selector') target = '/language-selector';
-    } else if (!isAuthenticated) {
+    if (!isAuthenticated) {
       if (currentRoute !== '(auth)') target = '/(auth)/welcome';
     } else if (!hasCompletedOnboarding) {
       if (currentRoute !== '(onboarding)') target = '/(onboarding)/step1-cuisines';
     } else {
-      if (currentRoute === '(auth)' || currentRoute === '(onboarding)' || currentRoute === 'language-selector') {
+      if (currentRoute === '(auth)' || currentRoute === '(onboarding)') {
         target = '/(tabs)';
       }
     }
@@ -62,7 +58,7 @@ export default function RootLayout() {
       lastRedirect.current = target;
       router.replace(target as any);
     }
-  }, [isAuthenticated, isLoading, hasCompletedOnboarding, language, segments]);
+  }, [isAuthenticated, isLoading, hasCompletedOnboarding, segments]);
 
   if (isLoading) return null;
 
@@ -74,7 +70,6 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: colors.background },
         }}
       >
-        <Stack.Screen name="language-selector" />
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(tabs)" />
