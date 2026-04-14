@@ -57,14 +57,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signInWithEmail: async (email, password) => {
-    const { error } = await getSupabase().auth.signInWithPassword({ email, password });
+    const { data, error } = await getSupabase().auth.signInWithPassword({ email, password });
     if (error) return { error: error.message };
+    if (data.session) {
+      set({ session: data.session, user: data.session.user, isAuthenticated: true });
+    }
     return {};
   },
 
   signUpWithEmail: async (email, password) => {
-    const { error } = await getSupabase().auth.signUp({ email, password });
+    const { data, error } = await getSupabase().auth.signUp({ email, password });
     if (error) return { error: error.message };
+    if (data.session) {
+      set({ session: data.session, user: data.session.user, isAuthenticated: true });
+    }
     return {};
   },
 
