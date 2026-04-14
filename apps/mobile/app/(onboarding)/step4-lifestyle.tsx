@@ -59,14 +59,14 @@ export default function Step4Lifestyle() {
         <ProgressBar currentStep={4} totalSteps={5} />
 
         <View style={{ gap: spacing.xs }}>
-          <Text variant="h2">Your rhythm</Text>
+          <Text variant="h2">Votre rythme</Text>
           <Text variant="body" color={colors.textSecondary}>
-            Help us understand your lifestyle
+            Aidez-nous à comprendre votre style de vie
           </Text>
         </View>
 
         <View style={{ gap: spacing.sm }}>
-          <Text variant="label" color={colors.textSecondary}>When are you most active?</Text>
+          <Text variant="label" color={colors.textSecondary}>Quand êtes-vous le plus actif ?</Text>
           {LIFE_RHYTHM_OPTIONS.map((opt) => (
             <SelectCard
               key={opt.value}
@@ -78,7 +78,7 @@ export default function Step4Lifestyle() {
         </View>
 
         <View style={{ gap: spacing.sm }}>
-          <Text variant="label" color={colors.textSecondary}>Budget per outing</Text>
+          <Text variant="label" color={colors.textSecondary}>Budget par sortie</Text>
           {BUDGET_LEVEL_OPTIONS.map((opt) => (
             <SelectCard
               key={opt.value}
@@ -91,7 +91,7 @@ export default function Step4Lifestyle() {
         </View>
 
         <View style={{ gap: spacing.sm }}>
-          <Text variant="label" color={colors.textSecondary}>Dietary restrictions</Text>
+          <Text variant="label" color={colors.textSecondary}>Restrictions alimentaires</Text>
           <ChipGrid
             options={DIETARY_RESTRICTION_OPTIONS}
             selected={draft.dietary_restrictions}
@@ -102,7 +102,7 @@ export default function Step4Lifestyle() {
 
       <View style={{ marginTop: 'auto', paddingTop: spacing.lg }}>
         <Button
-          title="Next"
+          title="Suivant"
           onPress={() => router.push('/(onboarding)/step5-mobility')}
           size="lg"
         />

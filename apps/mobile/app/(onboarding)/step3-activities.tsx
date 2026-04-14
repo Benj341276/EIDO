@@ -25,9 +25,9 @@ export default function Step3Activities() {
         <ProgressBar currentStep={3} totalSteps={5} />
 
         <View style={{ gap: spacing.xs }}>
-          <Text variant="h2">How do you spend your time?</Text>
+          <Text variant="h2">Comment occupez-vous votre temps ?</Text>
           <Text variant="body" color={colors.textSecondary}>
-            Pick activities you enjoy
+            Choisissez vos activités préférées
           </Text>
         </View>
 
@@ -36,7 +36,7 @@ export default function Step3Activities() {
 
       <View style={{ marginTop: 'auto', paddingTop: spacing.lg }}>
         <Button
-          title="Next"
+          title="Suivant"
           onPress={() => router.push('/(onboarding)/step4-lifestyle')}
           size="lg"
         />

@@ -7,9 +7,9 @@ export default function ExploreScreen() {
   return (
     <ScreenContainer scroll={false} padding={false}>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.lg }}>
-        <Text variant="h2" align="center">Explore</Text>
+        <Text variant="h2" align="center">Explorer</Text>
         <Text variant="body" color={colors.textSecondary} align="center" style={{ marginTop: spacing.sm }}>
-          Map coming in Phase 5
+          Carte bientôt disponible
         </Text>
       </View>
     </ScreenContainer>

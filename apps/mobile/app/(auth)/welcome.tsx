@@ -30,12 +30,12 @@ export default function WelcomeScreen() {
 
       <View style={{ width: '100%', gap: spacing.md, paddingBottom: spacing['2xl'] }}>
         <Button
-          title="Get Started"
+          title="Commencer"
           onPress={() => router.push('/(auth)/sign-up')}
           size="lg"
         />
         <Button
-          title="I already have an account"
+          title="J'ai déjà un compte"
           onPress={() => router.push('/(auth)/sign-in')}
           variant="ghost"
         />

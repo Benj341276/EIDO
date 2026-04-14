@@ -34,14 +34,14 @@ export default function Step5Mobility() {
         <ProgressBar currentStep={5} totalSteps={5} />
 
         <View style={{ gap: spacing.xs }}>
-          <Text variant="h2">How do you get around?</Text>
+          <Text variant="h2">Comment vous déplacez-vous ?</Text>
           <Text variant="body" color={colors.textSecondary}>
-            This helps us find places within reach
+            Cela nous aide à trouver des lieux accessibles
           </Text>
         </View>
 
         <View style={{ gap: spacing.sm }}>
-          <Text variant="label" color={colors.textSecondary}>Transport mode</Text>
+          <Text variant="label" color={colors.textSecondary}>Mode de transport</Text>
           {MOBILITY_MODE_OPTIONS.map((opt) => (
             <Pressable key={opt.value} onPress={() => updateDraft({ mobility_mode: opt.value })}>
               <Card
@@ -63,7 +63,7 @@ export default function Step5Mobility() {
 
         <View style={{ gap: spacing.sm }}>
           <Text variant="label" color={colors.textSecondary}>
-            Search radius: {draft.default_radius_km} km
+            Rayon de recherche : {draft.default_radius_km} km
           </Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
             {RADIUS_OPTIONS.map((r) => (
@@ -96,7 +96,7 @@ export default function Step5Mobility() {
 
       <View style={{ marginTop: 'auto', paddingTop: spacing.lg }}>
         <Button
-          title="Complete Setup"
+          title="Terminer la configuration"
           onPress={handleComplete}
           loading={loading}
           size="lg"

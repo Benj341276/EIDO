@@ -25,9 +25,9 @@ export default function Step1Cuisines() {
         <ProgressBar currentStep={1} totalSteps={5} />
 
         <View style={{ gap: spacing.xs }}>
-          <Text variant="h2">What flavors do you love?</Text>
+          <Text variant="h2">Quelles saveurs aimez-vous ?</Text>
           <Text variant="body" color={colors.textSecondary}>
-            Pick at least one cuisine you enjoy
+            Choisissez au moins une cuisine
           </Text>
         </View>
 
@@ -36,7 +36,7 @@ export default function Step1Cuisines() {
 
       <View style={{ marginTop: 'auto', paddingTop: spacing.lg }}>
         <Button
-          title="Next"
+          title="Suivant"
           onPress={() => router.push('/(onboarding)/step2-music')}
           disabled={draft.cuisines.length === 0}
           size="lg"

@@ -25,9 +25,9 @@ export default function Step2Music() {
         <ProgressBar currentStep={2} totalSteps={5} />
 
         <View style={{ gap: spacing.xs }}>
-          <Text variant="h2">Your soundtrack</Text>
+          <Text variant="h2">Votre bande-son</Text>
           <Text variant="body" color={colors.textSecondary}>
-            What music do you vibe with? (optional)
+            Quels genres musicaux aimez-vous ? (optionnel)
           </Text>
         </View>
 
@@ -36,7 +36,7 @@ export default function Step2Music() {
 
       <View style={{ marginTop: 'auto', paddingTop: spacing.lg }}>
         <Button
-          title="Next"
+          title="Suivant"
           onPress={() => router.push('/(onboarding)/step3-activities')}
           size="lg"
         />

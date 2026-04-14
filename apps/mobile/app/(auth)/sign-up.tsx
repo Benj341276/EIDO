@@ -18,15 +18,15 @@ export default function SignUpScreen() {
 
   async function handleSignUp() {
     if (!email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
+      setError('Veuillez remplir tous les champs');
       return;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Les mots de passe ne correspondent pas');
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('Le mot de passe doit contenir au moins 6 caractères');
       return;
     }
     setError('');
@@ -43,16 +43,16 @@ export default function SignUpScreen() {
         style={{ flex: 1, justifyContent: 'center', gap: spacing.lg }}
       >
         <View style={{ gap: spacing.xs }}>
-          <Text variant="h2">Create account</Text>
+          <Text variant="h2">Créer un compte</Text>
           <Text variant="body" color={colors.textSecondary}>
-            Start optimizing your life
+            Commencez à optimiser votre vie
           </Text>
         </View>
 
         <View style={{ gap: spacing.md }}>
           <Input
-            label="Email"
-            placeholder="you@example.com"
+            label="E-mail"
+            placeholder="vous@exemple.com"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -60,15 +60,15 @@ export default function SignUpScreen() {
             autoComplete="email"
           />
           <Input
-            label="Password"
-            placeholder="At least 6 characters"
+            label="Mot de passe"
+            placeholder="Au moins 6 caractères"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
           />
           <Input
-            label="Confirm password"
-            placeholder="Repeat your password"
+            label="Confirmer le mot de passe"
+            placeholder="Répétez votre mot de passe"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
@@ -77,12 +77,12 @@ export default function SignUpScreen() {
 
         {error ? <Text variant="caption" color={colors.error}>{error}</Text> : null}
 
-        <Button title="Create Account" onPress={handleSignUp} loading={loading} size="lg" />
+        <Button title="Créer mon compte" onPress={handleSignUp} loading={loading} size="lg" />
 
         <Pressable onPress={() => router.replace('/(auth)/sign-in')}>
           <Text variant="body" color={colors.textSecondary} align="center">
-            Already have an account?{' '}
-            <Text color={colors.accent} weight="semibold">Sign in</Text>
+            Déjà un compte ?{' '}
+            <Text color={colors.accent} weight="semibold">Se connecter</Text>
           </Text>
         </Pressable>
       </KeyboardAvoidingView>

@@ -1,42 +1,45 @@
 export const CUISINE_OPTIONS = [
-  'Italian', 'Japanese', 'Mexican', 'Thai', 'Indian',
-  'French', 'Korean', 'Mediterranean', 'American', 'Chinese',
-  'Vietnamese', 'Middle Eastern', 'Greek', 'Spanish', 'Lebanese',
+  'Italien', 'Japonais', 'Mexicain', 'Thaïlandais', 'Indien',
+  'Français', 'Coréen', 'Méditerranéen', 'Américain', 'Chinois',
+  'Vietnamien', 'Moyen-Oriental', 'Grec', 'Espagnol', 'Libanais',
 ] as const;
 
 export const MUSIC_GENRE_OPTIONS = [
-  'Electro', 'Jazz', 'Hip-hop', 'Rock', 'Classical',
+  'Electro', 'Jazz', 'Hip-hop', 'Rock', 'Classique',
   'Pop', 'R&B', 'House', 'Techno', 'Reggae',
   'Metal', 'Indie', 'Folk', 'Latin', 'Soul',
 ] as const;
 
 export const ACTIVITY_OPTIONS = [
-  'Outdoor adventures', 'Museums & galleries', 'Live shows',
-  'Sports', 'Wellness & spa', 'Nightlife', 'Food tours',
-  'Parks & nature', 'Cinema', 'Concerts', 'Comedy',
-  'Escape rooms', 'Cooking classes', 'Art workshops',
+  'Plage', 'Montagne', 'Urbain', 'Campagne',
+  'Musées & galeries', 'Spectacles', 'Sports',
+  'Bien-être & spa', 'Vie nocturne', 'Tours gastronomiques',
+  'Parcs & nature', 'Cinéma', 'Concerts', 'Théâtre',
+  'Jeux vidéo', 'Flipper', 'Baby-foot',
+  'Escape rooms', 'Cours de cuisine', 'Ateliers créatifs',
+  'Comedy clubs',
 ] as const;
 
 export const LIFE_RHYTHM_OPTIONS = [
-  { value: 'early_bird', label: 'Early bird' },
-  { value: 'night_owl', label: 'Night owl' },
+  { value: 'early_bird', label: 'Lève-tôt' },
+  { value: 'night_owl', label: 'Couche-tard' },
   { value: 'flexible', label: 'Flexible' },
 ] as const;
 
 export const BUDGET_LEVEL_OPTIONS = [
-  { value: 'budget', label: 'Budget', description: 'Under €20/person' },
-  { value: 'moderate', label: 'Moderate', description: '€20–50/person' },
-  { value: 'premium', label: 'Premium', description: '€50–100/person' },
-  { value: 'luxury', label: 'Luxury', description: '€100+/person' },
+  { value: 'budget', label: 'Économique', description: 'Moins de 20€/personne' },
+  { value: 'moderate', label: 'Modéré', description: '20–50€/personne' },
+  { value: 'premium', label: 'Premium', description: '50–100€/personne' },
+  { value: 'luxury', label: 'Luxe', description: '100€+/personne' },
 ] as const;
 
 export const MOBILITY_MODE_OPTIONS = [
-  { value: 'walking', label: 'Walking' },
-  { value: 'cycling', label: 'Cycling' },
-  { value: 'driving', label: 'Driving' },
-  { value: 'transit', label: 'Public transit' },
+  { value: 'walking', label: 'À pied' },
+  { value: 'cycling', label: 'Vélo' },
+  { value: 'driving', label: 'Voiture' },
+  { value: 'transit', label: 'Transports en commun' },
 ] as const;
 
 export const DIETARY_RESTRICTION_OPTIONS = [
-  'Vegetarian', 'Vegan', 'Gluten-free', 'Halal', 'Kosher', 'None',
+  'Végétarien', 'Végan', 'Sans gluten', 'Halal', 'Casher', 'Aucune',
 ] as const;

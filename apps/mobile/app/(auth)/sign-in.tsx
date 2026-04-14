@@ -17,7 +17,7 @@ export default function SignInScreen() {
 
   async function handleSignIn() {
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setError('Veuillez remplir tous les champs');
       return;
     }
     setError('');
@@ -34,16 +34,16 @@ export default function SignInScreen() {
         style={{ flex: 1, justifyContent: 'center', gap: spacing.lg }}
       >
         <View style={{ gap: spacing.xs }}>
-          <Text variant="h2">Welcome back</Text>
+          <Text variant="h2">Content de vous revoir</Text>
           <Text variant="body" color={colors.textSecondary}>
-            Sign in to your account
+            Connectez-vous à votre compte
           </Text>
         </View>
 
         <View style={{ gap: spacing.md }}>
           <Input
-            label="Email"
-            placeholder="you@example.com"
+            label="E-mail"
+            placeholder="vous@exemple.com"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -51,8 +51,8 @@ export default function SignInScreen() {
             autoComplete="email"
           />
           <Input
-            label="Password"
-            placeholder="Your password"
+            label="Mot de passe"
+            placeholder="Votre mot de passe"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -61,12 +61,12 @@ export default function SignInScreen() {
 
         {error ? <Text variant="caption" color={colors.error}>{error}</Text> : null}
 
-        <Button title="Sign In" onPress={handleSignIn} loading={loading} size="lg" />
+        <Button title="Se connecter" onPress={handleSignIn} loading={loading} size="lg" />
 
         <Pressable onPress={() => router.replace('/(auth)/sign-up')}>
           <Text variant="body" color={colors.textSecondary} align="center">
-            Don't have an account?{' '}
-            <Text color={colors.accent} weight="semibold">Sign up</Text>
+            Pas encore de compte ?{' '}
+            <Text color={colors.accent} weight="semibold">S'inscrire</Text>
           </Text>
         </Pressable>
       </KeyboardAvoidingView>

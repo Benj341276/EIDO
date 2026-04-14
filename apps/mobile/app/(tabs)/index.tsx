@@ -9,7 +9,7 @@ export default function HomeScreen() {
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.lg }}>
         <Text variant="h2" align="center">EIDO Life</Text>
         <Text variant="body" color={colors.textSecondary} align="center" style={{ marginTop: spacing.sm }}>
-          Plan generation coming in Phase 3
+          Génération de plans bientôt disponible
         </Text>
       </View>
     </ScreenContainer>
