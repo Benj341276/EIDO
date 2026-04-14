@@ -1,13 +1,7 @@
-import { View, ViewStyle } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
+import { ViewStyle } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { useEffect } from 'react';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { radii } from '@/theme/spacing';
 
 interface Props {
@@ -18,14 +12,12 @@ interface Props {
 }
 
 export function Skeleton({ width, height, radius = radii.sm, style }: Props) {
+  const colors = useColors();
   const opacity = useSharedValue(0.3);
 
   useEffect(() => {
     opacity.value = withRepeat(
-      withSequence(
-        withTiming(0.7, { duration: 800 }),
-        withTiming(0.3, { duration: 800 }),
-      ),
+      withSequence(withTiming(0.7, { duration: 800 }), withTiming(0.3, { duration: 800 })),
       -1,
     );
   }, []);
@@ -35,12 +27,7 @@ export function Skeleton({ width, height, radius = radii.sm, style }: Props) {
   return (
     <Animated.View
       style={[
-        {
-          width: width as number,
-          height,
-          borderRadius: radius,
-          backgroundColor: colors.surfaceElevated,
-        },
+        { width: width as number, height, borderRadius: radius, backgroundColor: colors.surfaceElevated },
         animatedStyle,
         style,
       ]}

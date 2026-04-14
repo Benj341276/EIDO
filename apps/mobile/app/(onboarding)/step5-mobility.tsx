@@ -5,12 +5,13 @@ import { Text, Button, Card, ScreenContainer } from '@/components/ui';
 import { ProgressBar } from '@/components/onboarding/ProgressBar';
 import { usePreferencesStore } from '@/stores/preferences.store';
 import { MOBILITY_MODE_OPTIONS } from '@eido-life/shared';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { spacing } from '@/theme/spacing';
 
 const RADIUS_OPTIONS = [1, 3, 5, 10, 25, 50] as const;
 
 export default function Step5Mobility() {
+  const colors = useColors();
   const router = useRouter();
   const { draft, updateDraft, submitPreferences } = usePreferencesStore();
   const [loading, setLoading] = useState(false);

@@ -5,11 +5,14 @@ import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
 import { useAuthStore } from '@/stores/auth.store';
 import { usePreferencesStore } from '@/stores/preferences.store';
-import { colors } from '@/theme/colors';
+import { useThemeStore } from '@/stores/theme.store';
+import { useColors } from '@/theme/useColors';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const colors = useColors();
+  const themeMode = useThemeStore((s) => s.mode);
   const { isAuthenticated, isLoading: authLoading, initialize: initAuth } = useAuthStore();
   const { hasCompletedOnboarding, isLoading: prefsLoading, loadPreferences } = usePreferencesStore();
   const segments = useSegments();
@@ -62,8 +65,9 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="profile/edit-preferences" options={{ presentation: 'modal' }} />
       </Stack>
-      <StatusBar style="light" />
+      <StatusBar style={themeMode === 'dark' ? 'light' : 'dark'} />
     </>
   );
 }

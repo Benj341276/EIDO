@@ -1,23 +1,29 @@
-import { View } from 'react-native';
+import { View, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { Text, Button, Card, ScreenContainer } from '@/components/ui';
 import { useAuthStore } from '@/stores/auth.store';
 import { usePreferencesStore } from '@/stores/preferences.store';
-import { colors } from '@/theme/colors';
+import { useThemeStore } from '@/stores/theme.store';
+import { useColors } from '@/theme/useColors';
 import { spacing } from '@/theme/spacing';
 
 function PreferenceSection({ title, items }: { title: string; items: string[] }) {
   if (items.length === 0) return null;
   return (
     <View style={{ gap: spacing.xs }}>
-      <Text variant="label" color={colors.textSecondary}>{title}</Text>
+      <Text variant="label" color={useColors().textSecondary}>{title}</Text>
       <Text variant="body">{items.join(', ')}</Text>
     </View>
   );
 }
 
 export default function ProfileScreen() {
+  const colors = useColors();
+  const router = useRouter();
   const { user, signOut } = useAuthStore();
   const { preferences } = usePreferencesStore();
+  const { mode, toggleMode } = useThemeStore();
 
   return (
     <ScreenContainer>
@@ -29,9 +35,46 @@ export default function ProfileScreen() {
           </Text>
         </View>
 
+        <Card style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+            <Ionicons
+              name={mode === 'dark' ? 'moon' : 'sunny'}
+              size={20}
+              color={colors.accent}
+            />
+            <Text weight="medium">{mode === 'dark' ? 'Mode sombre' : 'Mode clair'}</Text>
+          </View>
+          <Pressable
+            onPress={toggleMode}
+            style={{
+              width: 50,
+              height: 28,
+              borderRadius: 14,
+              backgroundColor: mode === 'dark' ? colors.accent : colors.border,
+              justifyContent: 'center',
+              paddingHorizontal: 2,
+            }}
+          >
+            <View
+              style={{
+                width: 24,
+                height: 24,
+                borderRadius: 12,
+                backgroundColor: colors.white,
+                alignSelf: mode === 'dark' ? 'flex-end' : 'flex-start',
+              }}
+            />
+          </Pressable>
+        </Card>
+
         {preferences && (
           <Card style={{ gap: spacing.md }}>
-            <Text variant="h3">Mes préférences</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text variant="h3">Mes préférences</Text>
+              <Pressable onPress={() => router.push('/profile/edit-preferences')}>
+                <Text variant="caption" color={colors.accent} weight="semibold">Modifier</Text>
+              </Pressable>
+            </View>
 
             <PreferenceSection title="Cuisines" items={preferences.cuisines} />
             <PreferenceSection title="Musique" items={preferences.music_genres} />

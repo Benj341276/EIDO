@@ -1,10 +1,11 @@
 import { View, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Text, Button } from '@/components/ui';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { spacing } from '@/theme/spacing';
 
 export default function WelcomeScreen() {
+  const colors = useColors();
   const router = useRouter();
 
   return (

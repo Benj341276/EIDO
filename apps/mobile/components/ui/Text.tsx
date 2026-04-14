@@ -1,5 +1,5 @@
 import { Text as RNText, TextProps, TextStyle } from 'react-native';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { fontSizes, fontWeights, lineHeights } from '@/theme/typography';
 
 type Variant = 'display' | 'h1' | 'h2' | 'h3' | 'body' | 'caption' | 'label';
@@ -22,6 +22,7 @@ const variantStyles: Record<Variant, TextStyle> = {
 };
 
 export function Text({ variant = 'body', color, weight, align, style, ...props }: Props) {
+  const colors = useColors();
   return (
     <RNText
       style={[

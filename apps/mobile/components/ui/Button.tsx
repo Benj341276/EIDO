@@ -1,9 +1,9 @@
 import { Pressable, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { Text } from './Text';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { spacing, radii } from '@/theme/spacing';
-import { fontSizes, fontWeights } from '@/theme/typography';
+import { fontSizes } from '@/theme/typography';
 
 type Variant = 'primary' | 'secondary' | 'ghost';
 type Size = 'sm' | 'md' | 'lg';
@@ -25,15 +25,17 @@ const sizeStyles: Record<Size, { container: ViewStyle; text: TextStyle }> = {
   lg: { container: { paddingVertical: spacing.md, paddingHorizontal: spacing.xl }, text: { fontSize: fontSizes.lg } },
 };
 
-const variantStyles: Record<Variant, { container: ViewStyle; textColor: string }> = {
-  primary: { container: { backgroundColor: colors.accent }, textColor: colors.white },
-  secondary: { container: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }, textColor: colors.white },
-  ghost: { container: { backgroundColor: 'transparent' }, textColor: colors.accent },
-};
-
 export function Button({ title, onPress, variant = 'primary', size = 'md', loading, disabled }: Props) {
+  const colors = useColors();
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
+  const variants: Record<Variant, { bg: string; border?: string; textColor: string }> = {
+    primary: { bg: colors.accent, textColor: colors.white },
+    secondary: { bg: colors.surface, border: colors.border, textColor: colors.textPrimary },
+    ghost: { bg: 'transparent', textColor: colors.accent },
+  };
+  const v = variants[variant];
 
   return (
     <AnimatedPressable
@@ -47,20 +49,17 @@ export function Button({ title, onPress, variant = 'primary', size = 'md', loadi
           alignItems: 'center',
           justifyContent: 'center',
           opacity: disabled ? 0.5 : 1,
+          backgroundColor: v.bg,
+          ...(v.border ? { borderWidth: 1, borderColor: v.border } : {}),
         },
-        variantStyles[variant].container,
         sizeStyles[size].container,
         animatedStyle,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={variantStyles[variant].textColor} />
+        <ActivityIndicator color={v.textColor} />
       ) : (
-        <Text
-          weight="semibold"
-          color={variantStyles[variant].textColor}
-          style={sizeStyles[size].text}
-        >
+        <Text weight="semibold" color={v.textColor} style={sizeStyles[size].text}>
           {title}
         </Text>
       )}

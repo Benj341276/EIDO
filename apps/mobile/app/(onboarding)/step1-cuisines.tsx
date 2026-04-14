@@ -5,10 +5,11 @@ import { ProgressBar } from '@/components/onboarding/ProgressBar';
 import { ChipGrid } from '@/components/onboarding/ChipGrid';
 import { usePreferencesStore } from '@/stores/preferences.store';
 import { CUISINE_OPTIONS } from '@eido-life/shared';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { spacing } from '@/theme/spacing';
 
 export default function Step1Cuisines() {
+  const colors = useColors();
   const router = useRouter();
   const { draft, updateDraft } = usePreferencesStore();
 

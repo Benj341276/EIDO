@@ -34,7 +34,9 @@ interface PreferencesState {
   loadPreferences: () => Promise<void>;
   updateDraft: (partial: Partial<OnboardingDraft>) => void;
   resetDraft: () => void;
+  loadDraftFromPreferences: () => void;
   submitPreferences: () => Promise<{ error?: string }>;
+  updatePreferences: () => Promise<{ error?: string }>;
 }
 
 export const usePreferencesStore = create<PreferencesState>((set, get) => ({
@@ -75,6 +77,23 @@ export const usePreferencesStore = create<PreferencesState>((set, get) => ({
     set({ draft: { ...emptyDraft } });
   },
 
+  loadDraftFromPreferences: () => {
+    const prefs = get().preferences;
+    if (!prefs) return;
+    set({
+      draft: {
+        cuisines: prefs.cuisines ?? [],
+        music_genres: prefs.music_genres ?? [],
+        activities: prefs.activities ?? [],
+        life_rhythm: prefs.life_rhythm,
+        budget_level: prefs.budget_level,
+        mobility_mode: prefs.mobility_mode,
+        default_radius_km: prefs.default_radius_km ?? 5,
+        dietary_restrictions: prefs.dietary_restrictions ?? [],
+      },
+    });
+  },
+
   submitPreferences: async () => {
     const userId = useAuthStore.getState().user?.id;
     if (!userId) return { error: 'Not authenticated' };
@@ -88,6 +107,23 @@ export const usePreferencesStore = create<PreferencesState>((set, get) => ({
         ...draft,
         onboarding_completed: true,
       });
+
+    if (error) return { error: error.message };
+
+    await get().loadPreferences();
+    return {};
+  },
+
+  updatePreferences: async () => {
+    const userId = useAuthStore.getState().user?.id;
+    if (!userId) return { error: 'Not authenticated' };
+
+    const { draft } = get();
+
+    const { error } = await getSupabase()
+      .from('user_preferences')
+      .update({ ...draft })
+      .eq('user_id', userId);
 
     if (error) return { error: error.message };
 

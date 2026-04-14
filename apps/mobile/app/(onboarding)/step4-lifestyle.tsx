@@ -9,7 +9,7 @@ import {
   BUDGET_LEVEL_OPTIONS,
   DIETARY_RESTRICTION_OPTIONS,
 } from '@eido-life/shared';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { spacing } from '@/theme/spacing';
 
 function SelectCard({
@@ -23,6 +23,7 @@ function SelectCard({
   selected: boolean;
   onPress: () => void;
 }) {
+  const colors = useColors();
   return (
     <Pressable onPress={onPress}>
       <Card
@@ -43,6 +44,7 @@ function SelectCard({
 }
 
 export default function Step4Lifestyle() {
+  const colors = useColors();
   const router = useRouter();
   const { draft, updateDraft } = usePreferencesStore();
 

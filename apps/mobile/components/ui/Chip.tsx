@@ -1,7 +1,7 @@
 import { Pressable } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { Text } from './Text';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { spacing, radii } from '@/theme/spacing';
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export function Chip({ label, selected, onPress }: Props) {
+  const colors = useColors();
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
@@ -33,11 +34,7 @@ export function Chip({ label, selected, onPress }: Props) {
         animatedStyle,
       ]}
     >
-      <Text
-        variant="caption"
-        weight="medium"
-        color={selected ? colors.accent : colors.textSecondary}
-      >
+      <Text variant="caption" weight="medium" color={selected ? colors.accent : colors.textSecondary}>
         {label}
       </Text>
     </AnimatedPressable>

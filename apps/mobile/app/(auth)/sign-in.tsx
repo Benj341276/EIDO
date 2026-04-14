@@ -3,10 +3,11 @@ import { View, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Text, Button, Input, ScreenContainer } from '@/components/ui';
 import { useAuthStore } from '@/stores/auth.store';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { spacing } from '@/theme/spacing';
 
 export default function SignInScreen() {
+  const colors = useColors();
   const router = useRouter();
   const signIn = useAuthStore((s) => s.signInWithEmail);
 

@@ -1,6 +1,6 @@
 import { ScrollView, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { spacing } from '@/theme/spacing';
 
 interface Props {
@@ -11,13 +11,10 @@ interface Props {
 }
 
 export function ScreenContainer({ children, scroll = true, padding = true, style }: Props) {
+  const colors = useColors();
   const content = scroll ? (
     <ScrollView
-      contentContainerStyle={[
-        padding && { padding: spacing.lg },
-        { flexGrow: 1 },
-        style,
-      ]}
+      contentContainerStyle={[padding && { padding: spacing.lg }, { flexGrow: 1 }, style]}
       keyboardShouldPersistTaps="handled"
     >
       {children}

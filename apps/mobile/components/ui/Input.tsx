@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, TextInput, TextInputProps, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from './Text';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { spacing, radii } from '@/theme/spacing';
 import { fontSizes } from '@/theme/typography';
 
@@ -12,14 +12,13 @@ interface Props extends TextInputProps {
 }
 
 export function Input({ label, error, secureTextEntry, style, ...props }: Props) {
+  const colors = useColors();
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(secureTextEntry);
 
   return (
     <View style={{ gap: spacing.xs }}>
-      {label && (
-        <Text variant="label" color={colors.textSecondary}>{label}</Text>
-      )}
+      {label && <Text variant="label" color={colors.textSecondary}>{label}</Text>}
       <View
         style={{
           flexDirection: 'row',
@@ -37,29 +36,18 @@ export function Input({ label, error, secureTextEntry, style, ...props }: Props)
           onBlur={() => setFocused(false)}
           secureTextEntry={hidden}
           style={[
-            {
-              flex: 1,
-              color: colors.textPrimary,
-              fontSize: fontSizes.base,
-              paddingVertical: spacing.md - 2,
-            },
+            { flex: 1, color: colors.textPrimary, fontSize: fontSizes.base, paddingVertical: spacing.md - 2 },
             style,
           ]}
           {...props}
         />
         {secureTextEntry && (
           <Pressable onPress={() => setHidden(!hidden)} hitSlop={8}>
-            <Ionicons
-              name={hidden ? 'eye-off-outline' : 'eye-outline'}
-              size={20}
-              color={colors.textSecondary}
-            />
+            <Ionicons name={hidden ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.textSecondary} />
           </Pressable>
         )}
       </View>
-      {error && (
-        <Text variant="caption" color={colors.error}>{error}</Text>
-      )}
+      {error && <Text variant="caption" color={colors.error}>{error}</Text>}
     </View>
   );
 }

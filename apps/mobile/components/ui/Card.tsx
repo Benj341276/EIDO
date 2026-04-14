@@ -1,5 +1,5 @@
 import { View, ViewProps } from 'react-native';
-import { colors } from '@/theme/colors';
+import { useColors } from '@/theme/useColors';
 import { spacing, radii } from '@/theme/spacing';
 
 interface Props extends ViewProps {
@@ -7,6 +7,7 @@ interface Props extends ViewProps {
 }
 
 export function Card({ elevated, style, children, ...props }: Props) {
+  const colors = useColors();
   return (
     <View
       style={[
