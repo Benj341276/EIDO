@@ -9,7 +9,7 @@ import { useThemeStore } from '@/stores/theme.store';
 import { useLanguageStore } from '@/stores/language.store';
 import { useColors } from '@/theme/useColors';
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const colors = useColors();
@@ -21,6 +21,10 @@ export default function RootLayout() {
   const segments = useSegments();
   const router = useRouter();
   const lastRedirect = useRef('');
+
+  useEffect(() => {
+    lastRedirect.current = '';
+  }, [segments]);
 
   useEffect(() => {
     initAuth();
@@ -36,7 +40,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (isLoading) return;
-    SplashScreen.hideAsync();
+    SplashScreen.hideAsync().catch(() => {});
 
     const currentRoute = segments[0] ?? '';
 
