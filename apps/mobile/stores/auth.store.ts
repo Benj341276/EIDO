@@ -28,6 +28,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     const client = getSupabase();
     const { data } = await client.auth.getSession();
+
+    // Validate session is still valid server-side
+    if (data.session) {
+      const { data: userData, error } = await client.auth.getUser(data.session.access_token);
+      if (error || !userData.user) {
+        // Session invalid (user deleted, token expired) — clear it
+        await client.auth.signOut();
+        set({ session: null, user: null, isAuthenticated: false, isLoading: false });
+        return;
+      }
+    }
+
     set({
       session: data.session,
       user: data.session?.user ?? null,
