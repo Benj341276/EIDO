@@ -1,0 +1,179 @@
+export const fr = {
+  // Common
+  'common.next': 'Suivant',
+  'common.save': 'Enregistrer',
+  'common.cancel': 'Annuler',
+  'common.signOut': 'Se déconnecter',
+  'common.modify': 'Modifier',
+
+  // Language selector
+  'lang.choose': 'Choisissez votre langue',
+
+  // Welcome
+  'welcome.subtitle': 'Optimisateur de vie',
+  'welcome.getStarted': 'Commencer',
+  'welcome.haveAccount': "J'ai déjà un compte",
+
+  // Sign In
+  'signIn.title': 'Content de vous revoir',
+  'signIn.subtitle': 'Connectez-vous à votre compte',
+  'signIn.email': 'E-mail',
+  'signIn.emailPlaceholder': 'vous@exemple.com',
+  'signIn.password': 'Mot de passe',
+  'signIn.passwordPlaceholder': 'Votre mot de passe',
+  'signIn.submit': 'Se connecter',
+  'signIn.noAccount': 'Pas encore de compte ?',
+  'signIn.signUp': "S'inscrire",
+  'signIn.fillAll': 'Veuillez remplir tous les champs',
+
+  // Sign Up
+  'signUp.title': 'Créer un compte',
+  'signUp.subtitle': 'Commencez à optimiser votre vie',
+  'signUp.email': 'E-mail',
+  'signUp.emailPlaceholder': 'vous@exemple.com',
+  'signUp.password': 'Mot de passe',
+  'signUp.passwordPlaceholder': 'Au moins 6 caractères',
+  'signUp.confirm': 'Confirmer le mot de passe',
+  'signUp.confirmPlaceholder': 'Répétez votre mot de passe',
+  'signUp.submit': 'Créer mon compte',
+  'signUp.haveAccount': 'Déjà un compte ?',
+  'signUp.signIn': 'Se connecter',
+  'signUp.fillAll': 'Veuillez remplir tous les champs',
+  'signUp.mismatch': 'Les mots de passe ne correspondent pas',
+  'signUp.tooShort': 'Le mot de passe doit contenir au moins 6 caractères',
+
+  // Onboarding
+  'onboarding.step1.title': 'Quelles saveurs aimez-vous ?',
+  'onboarding.step1.subtitle': 'Choisissez au moins une cuisine',
+  'onboarding.step2.title': 'Votre bande-son',
+  'onboarding.step2.subtitle': 'Quels genres musicaux aimez-vous ? (optionnel)',
+  'onboarding.step3.title': 'Comment occupez-vous votre temps ?',
+  'onboarding.step3.subtitle': 'Choisissez vos activités préférées',
+  'onboarding.step4.title': 'Votre rythme',
+  'onboarding.step4.subtitle': 'Aidez-nous à comprendre votre style de vie',
+  'onboarding.step4.whenActive': 'Quand êtes-vous le plus actif ?',
+  'onboarding.step4.budget': 'Budget par sortie',
+  'onboarding.step4.dietary': 'Restrictions alimentaires',
+  'onboarding.step5.title': 'Comment vous déplacez-vous ?',
+  'onboarding.step5.subtitle': 'Cela nous aide à trouver des lieux accessibles',
+  'onboarding.step5.transport': 'Mode de transport',
+  'onboarding.step5.radius': 'Rayon de recherche',
+  'onboarding.step5.complete': 'Terminer la configuration',
+
+  // Tabs
+  'tabs.home': 'Accueil',
+  'tabs.explore': 'Explorer',
+  'tabs.profile': 'Profil',
+
+  // Home
+  'home.comingSoon': 'Génération de plans bientôt disponible',
+
+  // Explore
+  'explore.comingSoon': 'Carte bientôt disponible',
+
+  // Profile
+  'profile.title': 'Profil',
+  'profile.notSignedIn': 'Non connecté',
+  'profile.darkMode': 'Mode sombre',
+  'profile.lightMode': 'Mode clair',
+  'profile.myPreferences': 'Mes préférences',
+  'profile.language': 'Langue',
+  'profile.editPreferences': 'Modifier mes préférences',
+
+  // Edit Preferences
+  'editPrefs.title': 'Modifier mes préférences',
+  'editPrefs.cuisines': 'Cuisines',
+  'editPrefs.music': 'Musique',
+  'editPrefs.activities': 'Activités',
+  'editPrefs.rhythm': 'Rythme de vie',
+  'editPrefs.budget': 'Budget par sortie',
+  'editPrefs.transport': 'Mode de transport',
+  'editPrefs.radius': 'Rayon de recherche',
+  'editPrefs.dietary': 'Restrictions alimentaires',
+
+  // Categories - Cuisines
+  'cuisine.italian': 'Italien',
+  'cuisine.japanese': 'Japonais',
+  'cuisine.mexican': 'Mexicain',
+  'cuisine.thai': 'Thaïlandais',
+  'cuisine.indian': 'Indien',
+  'cuisine.french': 'Français',
+  'cuisine.korean': 'Coréen',
+  'cuisine.mediterranean': 'Méditerranéen',
+  'cuisine.american': 'Américain',
+  'cuisine.chinese': 'Chinois',
+  'cuisine.vietnamese': 'Vietnamien',
+  'cuisine.middle_eastern': 'Moyen-Oriental',
+  'cuisine.greek': 'Grec',
+  'cuisine.spanish': 'Espagnol',
+  'cuisine.lebanese': 'Libanais',
+
+  // Categories - Music
+  'music.electro': 'Electro',
+  'music.jazz': 'Jazz',
+  'music.hiphop': 'Hip-hop',
+  'music.rock': 'Rock',
+  'music.classical': 'Classique',
+  'music.pop': 'Pop',
+  'music.rnb': 'R&B',
+  'music.house': 'House',
+  'music.techno': 'Techno',
+  'music.reggae': 'Reggae',
+  'music.metal': 'Metal',
+  'music.indie': 'Indie',
+  'music.folk': 'Folk',
+  'music.latin': 'Latin',
+  'music.soul': 'Soul',
+
+  // Categories - Activities
+  'activity.beach': 'Plage',
+  'activity.mountain': 'Montagne',
+  'activity.urban': 'Urbain',
+  'activity.countryside': 'Campagne',
+  'activity.museums': 'Musées & galeries',
+  'activity.shows': 'Spectacles',
+  'activity.sports': 'Sports',
+  'activity.wellness': 'Bien-être & spa',
+  'activity.nightlife': 'Vie nocturne',
+  'activity.food_tours': 'Tours gastronomiques',
+  'activity.parks': 'Parcs & nature',
+  'activity.cinema': 'Cinéma',
+  'activity.concerts': 'Concerts',
+  'activity.theater': 'Théâtre',
+  'activity.video_games': 'Jeux vidéo',
+  'activity.pinball': 'Flipper',
+  'activity.foosball': 'Baby-foot',
+  'activity.escape_rooms': 'Escape rooms',
+  'activity.cooking_classes': 'Cours de cuisine',
+  'activity.creative_workshops': 'Ateliers créatifs',
+  'activity.comedy': 'Comedy clubs',
+
+  // Categories - Life Rhythm
+  'rhythm.early_bird': 'Lève-tôt',
+  'rhythm.night_owl': 'Couche-tard',
+  'rhythm.flexible': 'Flexible',
+
+  // Categories - Budget
+  'budget.budget': 'Économique',
+  'budget.budget.desc': 'Moins de 20€/personne',
+  'budget.moderate': 'Modéré',
+  'budget.moderate.desc': '20–50€/personne',
+  'budget.premium': 'Premium',
+  'budget.premium.desc': '50–100€/personne',
+  'budget.luxury': 'Luxe',
+  'budget.luxury.desc': '100€+/personne',
+
+  // Categories - Mobility
+  'mobility.walking': 'À pied',
+  'mobility.cycling': 'Vélo',
+  'mobility.driving': 'Voiture',
+  'mobility.transit': 'Transports en commun',
+
+  // Categories - Dietary
+  'dietary.vegetarian': 'Végétarien',
+  'dietary.vegan': 'Végan',
+  'dietary.gluten_free': 'Sans gluten',
+  'dietary.halal': 'Halal',
+  'dietary.kosher': 'Casher',
+  'dietary.none': 'Aucune',
+} as const;

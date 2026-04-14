@@ -4,6 +4,7 @@ import { Text, Button, ScreenContainer } from '@/components/ui';
 import { ProgressBar } from '@/components/onboarding/ProgressBar';
 import { ChipGrid } from '@/components/onboarding/ChipGrid';
 import { usePreferencesStore } from '@/stores/preferences.store';
+import { useTranslation } from '@/i18n';
 import { CUISINE_OPTIONS } from '@eido-life/shared';
 import { useColors } from '@/theme/useColors';
 import { spacing } from '@/theme/spacing';
@@ -11,12 +12,11 @@ import { spacing } from '@/theme/spacing';
 export default function Step1Cuisines() {
   const colors = useColors();
   const router = useRouter();
+  const { t } = useTranslation();
   const { draft, updateDraft } = usePreferencesStore();
 
   function toggle(value: string) {
-    const next = draft.cuisines.includes(value)
-      ? draft.cuisines.filter((v) => v !== value)
-      : [...draft.cuisines, value];
+    const next = draft.cuisines.includes(value) ? draft.cuisines.filter((v) => v !== value) : [...draft.cuisines, value];
     updateDraft({ cuisines: next });
   }
 
@@ -24,24 +24,14 @@ export default function Step1Cuisines() {
     <ScreenContainer>
       <View style={{ gap: spacing.lg }}>
         <ProgressBar currentStep={1} totalSteps={5} />
-
         <View style={{ gap: spacing.xs }}>
-          <Text variant="h2">Quelles saveurs aimez-vous ?</Text>
-          <Text variant="body" color={colors.textSecondary}>
-            Choisissez au moins une cuisine
-          </Text>
+          <Text variant="h2">{t('onboarding.step1.title')}</Text>
+          <Text variant="body" color={colors.textSecondary}>{t('onboarding.step1.subtitle')}</Text>
         </View>
-
-        <ChipGrid options={CUISINE_OPTIONS} selected={draft.cuisines} onToggle={toggle} />
+        <ChipGrid options={CUISINE_OPTIONS} selected={draft.cuisines} onToggle={toggle} labelFn={(k) => t(`cuisine.${k}`)} />
       </View>
-
       <View style={{ marginTop: 'auto', paddingTop: spacing.lg }}>
-        <Button
-          title="Suivant"
-          onPress={() => router.push('/(onboarding)/step2-music')}
-          disabled={draft.cuisines.length === 0}
-          size="lg"
-        />
+        <Button title={t('common.next')} onPress={() => router.push('/(onboarding)/step2-music')} disabled={draft.cuisines.length === 0} size="lg" />
       </View>
     </ScreenContainer>
   );

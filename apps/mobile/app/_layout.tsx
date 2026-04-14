@@ -6,6 +6,7 @@ import 'react-native-reanimated';
 import { useAuthStore } from '@/stores/auth.store';
 import { usePreferencesStore } from '@/stores/preferences.store';
 import { useThemeStore } from '@/stores/theme.store';
+import { useLanguageStore } from '@/stores/language.store';
 import { useColors } from '@/theme/useColors';
 
 SplashScreen.preventAutoHideAsync();
@@ -13,6 +14,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colors = useColors();
   const themeMode = useThemeStore((s) => s.mode);
+  const language = useLanguageStore((s) => s.language);
   const { isAuthenticated, isLoading: authLoading, initialize: initAuth } = useAuthStore();
   const { hasCompletedOnboarding, isLoading: prefsLoading, loadPreferences } = usePreferencesStore();
   const segments = useSegments();
@@ -34,23 +36,45 @@ export default function RootLayout() {
     if (isLoading) return;
     SplashScreen.hideAsync();
 
-    const inAuthGroup = segments[0] === '(auth)';
-    const inOnboardingGroup = segments[0] === '(onboarding)';
+    const currentRoute = segments[0];
+    const inLangSelector = currentRoute === 'language-selector';
+    const inAuthGroup = currentRoute === '(auth)';
+    const inOnboardingGroup = currentRoute === '(onboarding)';
 
-    if (!isAuthenticated && !inAuthGroup) {
+    // Step 1: Language not chosen yet
+    if (!language && !inLangSelector) {
+      router.replace('/language-selector');
+      return;
+    }
+
+    // Step 2: Not authenticated
+    if (language && !isAuthenticated && !inAuthGroup && !inLangSelector) {
       router.replace('/(auth)/welcome');
-    } else if (isAuthenticated && inAuthGroup) {
+      return;
+    }
+
+    // Step 3: Authenticated, coming from auth
+    if (isAuthenticated && inAuthGroup) {
       if (!hasCompletedOnboarding) {
         router.replace('/(onboarding)/step1-cuisines');
       } else {
         router.replace('/(tabs)');
       }
-    } else if (isAuthenticated && !hasCompletedOnboarding && !inOnboardingGroup) {
-      router.replace('/(onboarding)/step1-cuisines');
-    } else if (isAuthenticated && hasCompletedOnboarding && inOnboardingGroup) {
-      router.replace('/(tabs)');
+      return;
     }
-  }, [isAuthenticated, isLoading, hasCompletedOnboarding, segments]);
+
+    // Step 4: Authenticated, no onboarding done
+    if (isAuthenticated && !hasCompletedOnboarding && !inOnboardingGroup) {
+      router.replace('/(onboarding)/step1-cuisines');
+      return;
+    }
+
+    // Step 5: Authenticated, onboarding done, still in onboarding
+    if (isAuthenticated && hasCompletedOnboarding && inOnboardingGroup) {
+      router.replace('/(tabs)');
+      return;
+    }
+  }, [isAuthenticated, isLoading, hasCompletedOnboarding, language, segments]);
 
   if (isLoading) return null;
 
@@ -62,6 +86,7 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: colors.background },
         }}
       >
+        <Stack.Screen name="language-selector" />
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(tabs)" />
