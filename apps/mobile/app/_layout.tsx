@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Stack, useSegments, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -15,10 +15,12 @@ export default function RootLayout() {
   const colors = useColors();
   const themeMode = useThemeStore((s) => s.mode);
   const language = useLanguageStore((s) => s.language);
+  const langHydrated = useLanguageStore((s) => s._hydrated);
   const { isAuthenticated, isLoading: authLoading, initialize: initAuth } = useAuthStore();
   const { hasCompletedOnboarding, isLoading: prefsLoading, loadPreferences } = usePreferencesStore();
   const segments = useSegments();
   const router = useRouter();
+  const lastRedirect = useRef('');
 
   useEffect(() => {
     initAuth();
@@ -30,49 +32,31 @@ export default function RootLayout() {
     }
   }, [isAuthenticated]);
 
-  const isLoading = authLoading || (isAuthenticated && prefsLoading);
+  const isLoading = !langHydrated || authLoading || (isAuthenticated && prefsLoading);
 
   useEffect(() => {
     if (isLoading) return;
     SplashScreen.hideAsync();
 
-    const currentRoute = segments[0];
-    const inLangSelector = currentRoute === 'language-selector';
-    const inAuthGroup = currentRoute === '(auth)';
-    const inOnboardingGroup = currentRoute === '(onboarding)';
+    const currentRoute = segments[0] ?? '';
 
-    // Step 1: Language not chosen yet
-    if (!language && !inLangSelector) {
-      router.replace('/language-selector');
-      return;
-    }
+    let target = '';
 
-    // Step 2: Not authenticated
-    if (language && !isAuthenticated && !inAuthGroup && !inLangSelector) {
-      router.replace('/(auth)/welcome');
-      return;
-    }
-
-    // Step 3: Authenticated, coming from auth
-    if (isAuthenticated && inAuthGroup) {
-      if (!hasCompletedOnboarding) {
-        router.replace('/(onboarding)/step1-cuisines');
-      } else {
-        router.replace('/(tabs)');
+    if (!language) {
+      if (currentRoute !== 'language-selector') target = '/language-selector';
+    } else if (!isAuthenticated) {
+      if (currentRoute !== '(auth)') target = '/(auth)/welcome';
+    } else if (!hasCompletedOnboarding) {
+      if (currentRoute !== '(onboarding)') target = '/(onboarding)/step1-cuisines';
+    } else {
+      if (currentRoute === '(auth)' || currentRoute === '(onboarding)' || currentRoute === 'language-selector') {
+        target = '/(tabs)';
       }
-      return;
     }
 
-    // Step 4: Authenticated, no onboarding done
-    if (isAuthenticated && !hasCompletedOnboarding && !inOnboardingGroup) {
-      router.replace('/(onboarding)/step1-cuisines');
-      return;
-    }
-
-    // Step 5: Authenticated, onboarding done, still in onboarding
-    if (isAuthenticated && hasCompletedOnboarding && inOnboardingGroup) {
-      router.replace('/(tabs)');
-      return;
+    if (target && target !== lastRedirect.current) {
+      lastRedirect.current = target;
+      router.replace(target as any);
     }
   }, [isAuthenticated, isLoading, hasCompletedOnboarding, language, segments]);
 
