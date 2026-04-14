@@ -73,6 +73,8 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="plan/results" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="plan/item/[itemId]" options={{ presentation: 'modal' }} />
         <Stack.Screen name="profile/edit-preferences" options={{ presentation: 'modal' }} />
       </Stack>
       <StatusBar style={themeMode === 'dark' ? 'light' : 'dark'} />

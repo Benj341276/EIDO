@@ -66,7 +66,18 @@ export const fr = {
   'tabs.profile': 'Profil',
 
   // Home
-  'home.comingSoon': 'Génération de plans bientôt disponible',
+  'home.generatePlan': 'Mon plan',
+  'home.radius': 'Rayon',
+  'home.searching': 'Recherche en cours...',
+  'home.curating': 'Création de votre plan...',
+  'home.itemsFound': 'résultats trouvés',
+  'home.locationDenied': 'Accès à la localisation refusé',
+
+  // Plan
+  'plan.yourPlan': 'Votre plan',
+  'plan.noResults': 'Aucun résultat trouvé. Essayez un rayon plus grand.',
+  'plan.address': 'Adresse',
+  'plan.openInMaps': 'Ouvrir dans Maps',
 
   // Explore
   'explore.comingSoon': 'Carte bientôt disponible',

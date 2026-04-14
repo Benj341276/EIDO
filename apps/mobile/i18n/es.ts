@@ -58,7 +58,16 @@ export const es: Record<string, string> = {
   'tabs.explore': 'Explorar',
   'tabs.profile': 'Perfil',
 
-  'home.comingSoon': 'Generación de planes próximamente',
+  'home.generatePlan': 'Mi plan',
+  'home.radius': 'Radio',
+  'home.searching': 'Buscando cerca...',
+  'home.curating': 'Creando tu plan...',
+  'home.itemsFound': 'resultados encontrados',
+  'home.locationDenied': 'Acceso a ubicación denegado',
+  'plan.yourPlan': 'Tu plan',
+  'plan.noResults': 'No se encontraron resultados. Prueba un radio más grande.',
+  'plan.address': 'Dirección',
+  'plan.openInMaps': 'Abrir en Maps',
   'explore.comingSoon': 'Mapa próximamente',
 
   'profile.title': 'Perfil',

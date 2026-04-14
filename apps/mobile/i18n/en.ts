@@ -58,7 +58,16 @@ export const en: Record<string, string> = {
   'tabs.explore': 'Explore',
   'tabs.profile': 'Profile',
 
-  'home.comingSoon': 'Plan generation coming soon',
+  'home.generatePlan': 'My plan',
+  'home.radius': 'Radius',
+  'home.searching': 'Searching nearby...',
+  'home.curating': 'Creating your plan...',
+  'home.itemsFound': 'results found',
+  'home.locationDenied': 'Location access denied',
+  'plan.yourPlan': 'Your plan',
+  'plan.noResults': 'No results found. Try a larger radius.',
+  'plan.address': 'Address',
+  'plan.openInMaps': 'Open in Maps',
   'explore.comingSoon': 'Map coming soon',
 
   'profile.title': 'Profile',

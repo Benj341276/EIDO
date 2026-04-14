@@ -1,0 +1,127 @@
+export const SYSTEM_PROMPT = `Tu es un planificateur de journée expert pour l'application EIDO Life.
+Tu génères des recommandations personnalisées basées sur les préférences utilisateur et les données réelles de lieux.
+
+RÈGLES :
+- Sélectionne 3-5 restaurants, 2-4 activités, et 1-3 événements parmi les données fournies
+- Priorise la variété (ne pas recommander 3 restaurants italiens si l'utilisateur aime aussi le japonais)
+- Respecte les restrictions alimentaires
+- Donne un score de pertinence (match_score) entre 0 et 100 pour chaque item
+- Estime un coût réaliste par item basé sur le price_level et la localisation
+- Fournis une raison courte et engageante pour chaque recommandation (en français ou dans la langue de l'utilisateur)
+- Estime le coût total de la journée (min et max)
+- Si peu de données disponibles, recommande ce qu'il y a de mieux plutôt que de forcer des résultats`;
+
+export const PLAN_TOOL = {
+  name: 'generate_plan' as const,
+  description: 'Génère un plan personnalisé structuré avec restaurants, activités et événements',
+  input_schema: {
+    type: 'object' as const,
+    properties: {
+      restaurants: {
+        type: 'array' as const,
+        items: {
+          type: 'object' as const,
+          properties: {
+            external_id: { type: 'string' as const },
+            name: { type: 'string' as const },
+            reason: { type: 'string' as const },
+            match_score: { type: 'number' as const },
+            estimated_cost: { type: 'number' as const },
+            category_detail: { type: 'string' as const },
+          },
+          required: ['external_id', 'name', 'reason', 'match_score'],
+        },
+      },
+      activities: {
+        type: 'array' as const,
+        items: {
+          type: 'object' as const,
+          properties: {
+            external_id: { type: 'string' as const },
+            name: { type: 'string' as const },
+            reason: { type: 'string' as const },
+            match_score: { type: 'number' as const },
+            estimated_cost: { type: 'number' as const },
+            duration_minutes: { type: 'number' as const },
+          },
+          required: ['external_id', 'name', 'reason', 'match_score'],
+        },
+      },
+      events: {
+        type: 'array' as const,
+        items: {
+          type: 'object' as const,
+          properties: {
+            external_id: { type: 'string' as const },
+            name: { type: 'string' as const },
+            reason: { type: 'string' as const },
+            match_score: { type: 'number' as const },
+            estimated_cost: { type: 'number' as const },
+            date: { type: 'string' as const },
+          },
+          required: ['external_id', 'name', 'reason', 'match_score'],
+        },
+      },
+      day_cost_estimate: {
+        type: 'object' as const,
+        properties: {
+          min: { type: 'number' as const },
+          max: { type: 'number' as const },
+          currency: { type: 'string' as const },
+        },
+        required: ['min', 'max', 'currency'],
+      },
+    },
+    required: ['restaurants', 'activities', 'day_cost_estimate'],
+  },
+};
+
+export function buildUserPrompt(context: {
+  preferences: Record<string, any>;
+  feedbackSummary?: string;
+  restaurants: any[];
+  activities: any[];
+  events: any[];
+  location: { lat: number; lng: number };
+  radiusKm: number;
+  language: string;
+}): string {
+  const { preferences, feedbackSummary, restaurants, activities, events, location, radiusKm, language } = context;
+
+  let prompt = `CONTEXTE UTILISATEUR :
+- Position : ${location.lat}, ${location.lng} (rayon ${radiusKm}km)
+- Cuisines préférées : ${preferences.cuisines?.join(', ') || 'non spécifié'}
+- Genres musicaux : ${preferences.music_genres?.join(', ') || 'non spécifié'}
+- Activités préférées : ${preferences.activities?.join(', ') || 'non spécifié'}
+- Rythme de vie : ${preferences.life_rhythm || 'non spécifié'}
+- Budget : ${preferences.budget_level || 'non spécifié'}
+- Restrictions alimentaires : ${preferences.dietary_restrictions?.join(', ') || 'aucune'}
+- Langue de l'utilisateur : ${language}
+
+`;
+
+  if (feedbackSummary) {
+    prompt += `FEEDBACK PASSÉ :\n${feedbackSummary}\n\n`;
+  }
+
+  prompt += `RESTAURANTS DISPONIBLES (${restaurants.length}) :\n`;
+  for (const r of restaurants) {
+    prompt += `- [${r.id}] ${r.name} | ${r.address} | Note: ${r.rating ?? '?'}/5 | Prix: ${r.priceLevel ?? '?'}/4 | Types: ${r.types?.join(', ')}\n`;
+  }
+
+  prompt += `\nACTIVITÉS DISPONIBLES (${activities.length}) :\n`;
+  for (const a of activities) {
+    prompt += `- [${a.id}] ${a.name} | ${a.address} | Note: ${a.rating ?? '?'}/5 | Types: ${a.types?.join(', ')}\n`;
+  }
+
+  if (events.length > 0) {
+    prompt += `\nÉVÉNEMENTS À VENIR (${events.length}) :\n`;
+    for (const e of events) {
+      prompt += `- [${e.id}] ${e.name} | ${e.date} | ${e.venue ?? ''} | Prix: ${e.priceMin ?? '?'}–${e.priceMax ?? '?'}€\n`;
+    }
+  }
+
+  prompt += `\nGénère le meilleur plan pour cette journée en utilisant l'outil generate_plan. Réponds dans la langue : ${language}.`;
+
+  return prompt;
+}
