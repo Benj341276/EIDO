@@ -29,8 +29,13 @@ export const useLanguageStore = create<LanguageState>()(
     {
       name: 'eido-language',
       storage: createJSONStorage(() => AsyncStorage),
-      onRehydrateStorage: () => () => {
-        useLanguageStore.setState({ _hydrated: true });
+      onRehydrateStorage: () => (state) => {
+        // If persisted value is null (legacy) or missing, use device language
+        if (!state?.language) {
+          useLanguageStore.setState({ language: detectDeviceLanguage(), _hydrated: true });
+        } else {
+          useLanguageStore.setState({ _hydrated: true });
+        }
       },
     }
   )
