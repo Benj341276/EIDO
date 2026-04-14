@@ -10,27 +10,14 @@ interface GenerateBody {
 }
 
 export default async function plansRoutes(fastify: FastifyInstance) {
-  // Generate a plan — SSE streaming
+  // Generate a plan — JSON response
   fastify.post<{ Body: GenerateBody }>(
     '/plans/generate',
     { preHandler: [fastify.requireAuth] },
     async (request: FastifyRequest<{ Body: GenerateBody }>, reply: FastifyReply) => {
       const { latitude, longitude, radius_km, location_name, language } = request.body;
 
-      // SSE headers
-      reply.raw.writeHead(200, {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        Connection: 'keep-alive',
-      });
-
-      function sendEvent(event: string, data: any) {
-        reply.raw.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
-      }
-
       try {
-        sendEvent('status', { message: 'searching_places' });
-
         const result = await generateUserPlan({
           userId: request.userId,
           latitude,
@@ -41,22 +28,15 @@ export default async function plansRoutes(fastify: FastifyInstance) {
           supabase: request.supabaseClient,
         });
 
-        // Stream items one by one
-        for (const item of result.items) {
-          sendEvent('plan_item', item);
-        }
-
-        sendEvent('plan_complete', {
+        return {
           plan_id: result.planId,
+          items: result.items,
           total_cost: result.totalCost,
-          item_count: result.items.length,
-        });
+        };
       } catch (err: any) {
         console.error('[Plans] Generation error:', err);
-        sendEvent('error', { message: err.message ?? 'Plan generation failed' });
+        return reply.code(500).send({ error: err.message ?? 'Plan generation failed' });
       }
-
-      reply.raw.end();
     },
   );
 

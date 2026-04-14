@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import { streamSSE } from '@/lib/sse-client';
+import { getSupabase } from '@/lib/supabase';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
 
 export interface PlanItem {
   id: string;
@@ -23,60 +25,60 @@ interface PlanState {
   items: PlanItem[];
   totalCost: { min: number; max: number; currency: string } | null;
   isGenerating: boolean;
-  status: string;
   error: string | null;
 
   generatePlan: (lat: number, lng: number, radiusKm: number, language: string, locationName?: string) => Promise<void>;
   clear: () => void;
 }
 
-export const usePlanStore = create<PlanState>((set, get) => ({
+export const usePlanStore = create<PlanState>((set) => ({
   planId: null,
   items: [],
   totalCost: null,
   isGenerating: false,
-  status: '',
   error: null,
 
   generatePlan: async (lat, lng, radiusKm, language, locationName) => {
-    set({ isGenerating: true, items: [], planId: null, totalCost: null, error: null, status: 'searching_places' });
+    set({ isGenerating: true, items: [], planId: null, totalCost: null, error: null });
 
     try {
-      const stream = streamSSE('/plans/generate', {
-        latitude: lat,
-        longitude: lng,
-        radius_km: radiusKm,
-        location_name: locationName,
-        language,
+      const { data: sessionData } = await getSupabase().auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      const res = await fetch(`${API_URL}/plans/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          latitude: lat,
+          longitude: lng,
+          radius_km: radiusKm,
+          location_name: locationName,
+          language,
+        }),
       });
 
-      for await (const event of stream) {
-        switch (event.event) {
-          case 'status':
-            set({ status: event.data.message });
-            break;
-          case 'plan_item':
-            set((state) => ({ items: [...state.items, event.data as PlanItem] }));
-            break;
-          case 'plan_complete':
-            set({
-              planId: event.data.plan_id,
-              totalCost: event.data.total_cost,
-              isGenerating: false,
-              status: 'completed',
-            });
-            break;
-          case 'error':
-            set({ error: event.data.message, isGenerating: false, status: 'error' });
-            break;
-        }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Request failed' }));
+        throw new Error(err.error ?? `API error ${res.status}`);
       }
+
+      const data = await res.json();
+
+      set({
+        planId: data.plan_id,
+        items: data.items ?? [],
+        totalCost: data.total_cost,
+        isGenerating: false,
+      });
     } catch (err: any) {
-      set({ error: err.message ?? 'Generation failed', isGenerating: false, status: 'error' });
+      set({ error: err.message ?? 'Generation failed', isGenerating: false });
     }
   },
 
   clear: () => {
-    set({ planId: null, items: [], totalCost: null, isGenerating: false, status: '', error: null });
+    set({ planId: null, items: [], totalCost: null, isGenerating: false, error: null });
   },
 }));
