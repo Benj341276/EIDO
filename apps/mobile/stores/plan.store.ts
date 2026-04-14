@@ -60,12 +60,15 @@ export const usePlanStore = create<PlanState>((set) => ({
         }),
       });
 
+      const text = await res.text();
+
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Request failed' }));
-        throw new Error(err.error ?? `API error ${res.status}`);
+        let errorMsg = `API error ${res.status}`;
+        try { errorMsg = JSON.parse(text).error ?? errorMsg; } catch { errorMsg = text.slice(0, 200); }
+        throw new Error(errorMsg);
       }
 
-      const data = await res.json();
+      const data = JSON.parse(text);
 
       set({
         planId: data.plan_id,
