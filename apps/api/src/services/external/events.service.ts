@@ -3,6 +3,7 @@ export interface EventResult {
   name: string;
   description: string | null;
   date: string;
+  time: string | null;
   venue: string | null;
   address: string | null;
   lat: number | null;
@@ -72,21 +73,31 @@ async function searchPredictHQ(lat: number, lng: number, radiusKm: number): Prom
         const dist = haversineKm(lat, lng, e.location[1], e.location[0]);
         return dist <= radiusKm;
       })
-      .map((e: any) => ({
-        id: `phq_${e.id}`,
-        name: e.title,
-        description: e.description?.slice(0, 200) ?? null,
-        date: e.start?.split('T')[0] ?? '',
-        venue: e.entities?.[0]?.name ?? null,
-        address: null,
-        lat: e.location?.[1] ?? null,
-        lng: e.location?.[0] ?? null,
-        priceMin: null,
-        priceMax: null,
-        imageUrl: null,
-        ticketUrl: null,
-        source: 'predicthq',
-      }));
+      .map((e: any) => {
+        const startDate = e.start ?? '';
+        const date = startDate.split('T')[0] ?? '';
+        const time = startDate.includes('T') ? startDate.split('T')[1]?.slice(0, 5) : null;
+        const venueName = e.entities?.[0]?.name ?? null;
+        const eventLat = e.location?.[1] ?? null;
+        const eventLng = e.location?.[0] ?? null;
+
+        return {
+          id: `phq_${e.id}`,
+          name: e.title,
+          description: e.description?.slice(0, 200) ?? null,
+          date,
+          time,
+          venue: venueName,
+          address: null,
+          lat: eventLat,
+          lng: eventLng,
+          priceMin: null,
+          priceMax: null,
+          imageUrl: null,
+          ticketUrl: null,
+          source: 'predicthq',
+        };
+      });
   } catch (err) {
     console.error('[PredictHQ] Fetch error:', err);
     return [];
@@ -150,6 +161,7 @@ function parseTicketmasterEvents(json: any): EventResult[] {
     name: e.name,
     description: e.info ?? null,
     date: e.dates?.start?.localDate ?? '',
+    time: e.dates?.start?.localTime?.slice(0, 5) ?? null,
     venue: e._embedded?.venues?.[0]?.name ?? null,
     address: e._embedded?.venues?.[0]?.address?.line1 ?? null,
     lat: parseFloat(e._embedded?.venues?.[0]?.location?.latitude) || null,

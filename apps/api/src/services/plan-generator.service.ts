@@ -130,7 +130,7 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
         id: '',
         category,
         name: aiItem.name,
-        description: event?.date ? `📅 ${event.date}` : null,
+        description: event?.date ? `📅 ${event.date}${event.time ? ` à ${event.time}` : ''}` : null,
         reason: aiItem.reason,
         address,
         latitude: place?.lat ?? event?.lat ?? null,
@@ -140,16 +140,22 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
         estimated_cost: aiItem.estimated_cost ?? event?.priceMin ?? null,
         duration_minutes: aiItem.duration_minutes ?? null,
         image_url: place?.photoUrl ?? event?.imageUrl ?? null,
-        // external_url = fiche Google Maps (pour restaurants/activités)
+        // external_url = fiche Google Maps
         external_url: place?.googleMapsUrl ?? null,
         external_id: aiItem.external_id,
         sort_order: sortOrder++,
         metadata: {
-          // Liens
+          // Google Maps link (for places or generated for events)
           ...(place?.googleMapsUrl ? { google_maps_url: place.googleMapsUrl } : {}),
+          ...(!place?.googleMapsUrl && (event?.venue || event?.lat) ? {
+            google_maps_url: event.venue
+              ? `https://www.google.com/maps/search/${encodeURIComponent(event.venue)}`
+              : `https://www.google.com/maps/@${event.lat},${event.lng},15z`
+          } : {}),
           ...(place?.websiteUrl ? { website_url: place.websiteUrl } : {}),
           // Events
           ...(event?.date ? { event_date: event.date } : {}),
+          ...(event?.time ? { event_time: event.time } : {}),
           ...(event?.ticketUrl ? { ticket_url: event.ticketUrl } : {}),
           ...(event?.venue ? { venue: event.venue } : {}),
           ...(event?.priceMin != null ? { price_min: event.priceMin } : {}),

@@ -16,6 +16,7 @@ export default function PlanItemDetailScreen() {
   if (!item) return null;
 
   const eventDate = item.metadata?.event_date || (item.description?.startsWith('📅') ? item.description.slice(2).trim() : null);
+  const eventTime = item.metadata?.event_time;
   const ticketUrl = item.metadata?.ticket_url;
   const venue = item.metadata?.venue;
   const googleMapsUrl = item.metadata?.google_maps_url ?? item.external_url;
@@ -40,7 +41,7 @@ export default function PlanItemDetailScreen() {
 
           {eventDate && (
             <View style={{ backgroundColor: colors.accentMuted, paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radii.md, alignSelf: 'flex-start' }}>
-              <Text variant="body" weight="semibold" color={colors.accent}>📅 {eventDate}</Text>
+              <Text variant="body" weight="semibold" color={colors.accent}>📅 {eventDate}{eventTime ? ` à ${eventTime}` : ''}</Text>
             </View>
           )}
 

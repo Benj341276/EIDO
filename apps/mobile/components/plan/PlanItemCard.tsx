@@ -13,6 +13,7 @@ interface Props {
 export function PlanItemCard({ item, onPress }: Props) {
   const colors = useColors();
   const eventDate = item.metadata?.event_date || (item.description?.startsWith('📅') ? item.description.slice(2).trim() : null);
+  const eventTime = item.metadata?.event_time;
 
   return (
     <Pressable onPress={onPress} style={{ width: 220, marginRight: spacing.md }}>
@@ -33,7 +34,7 @@ export function PlanItemCard({ item, onPress }: Props) {
           {/* Event date */}
           {eventDate && (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Text variant="caption" color={colors.accent} weight="semibold">📅 {eventDate}</Text>
+              <Text variant="caption" color={colors.accent} weight="semibold">📅 {eventDate}{eventTime ? ` à ${eventTime}` : ''}</Text>
             </View>
           )}
 
