@@ -4,7 +4,7 @@ const TEXT_URL = 'https://places.googleapis.com/v1/places:searchText';
 
 // In-memory cache
 const cache = new Map<string, { data: PlaceResult[]; expiry: number }>();
-const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
 export interface PlaceResult {
   id: string;
@@ -138,8 +138,8 @@ async function fetchTextSearch(query: string, lat: number, lng: number, radiusMe
       },
       body: JSON.stringify({
         textQuery: query,
-        maxResultCount: 10,
-        locationBias: {
+        maxResultCount: 20,
+        locationRestriction: {
           circle: {
             center: { latitude: lat, longitude: lng },
             radius: radiusMeters,
