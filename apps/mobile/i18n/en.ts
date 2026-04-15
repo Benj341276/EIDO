@@ -77,6 +77,7 @@ export const en: Record<string, string> = {
   'profile.myPreferences': 'My preferences',
   'profile.language': 'Language',
   'profile.editPreferences': 'Edit my preferences',
+  'profile.planHistory': 'Plan history',
 
   'editPrefs.title': 'Edit my preferences',
   'editPrefs.cuisines': 'Cuisines',

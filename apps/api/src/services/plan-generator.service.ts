@@ -2,6 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { searchNearby, searchByCuisine, PlaceResult } from './external/google-places.service';
 import { searchEvents, EventResult } from './external/events.service';
 import { generatePlan, GeneratedItem } from './ai/claude.service';
+import { getUserFeedbackSummary, formatFeedbackForPrompt } from './feedback.service';
 
 interface GeneratePlanInput {
   userId: string;
@@ -90,9 +91,14 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
       }
     }
 
-    // 4. Call Claude to generate plan
+    // 4. Get feedback summary for personalization
+    const feedbackSummary = await getUserFeedbackSummary(supabase, userId);
+    const feedbackText = feedbackSummary ? formatFeedbackForPrompt(feedbackSummary) : undefined;
+
+    // 5. Call Claude to generate plan
     const aiPlan = await generatePlan({
       preferences: prefs ?? {},
+      feedbackSummary: feedbackText,
       restaurants,
       activities,
       events,

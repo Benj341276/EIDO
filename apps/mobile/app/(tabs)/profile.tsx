@@ -1,9 +1,11 @@
+import { useState, useEffect } from 'react';
 import { View, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, Button, Card, ScreenContainer } from '@/components/ui';
 import { useAuthStore } from '@/stores/auth.store';
 import { usePreferencesStore } from '@/stores/preferences.store';
+import { getSupabase } from '@/lib/supabase';
 import { useThemeStore } from '@/stores/theme.store';
 import { useLanguageStore, Language } from '@/stores/language.store';
 import { useTranslation } from '@/i18n';
@@ -21,6 +23,19 @@ export default function ProfileScreen() {
   const { preferences } = usePreferencesStore();
   const { mode, toggleMode } = useThemeStore();
   const { language, setLanguage } = useLanguageStore();
+
+  const [planHistory, setPlanHistory] = useState<any[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await getSupabase()
+        .from('plans')
+        .select('id, location_name, radius_km, status, total_estimated_cost, created_at')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (data) setPlanHistory(data);
+    })();
+  }, []);
 
   function tCategory(prefix: string, key: string) { return t(`${prefix}.${key}`); }
 
@@ -119,6 +134,30 @@ export default function ProfileScreen() {
               <Text variant="label" color={colors.textSecondary}>{t('editPrefs.radius')}</Text>
               <Text variant="body">{preferences.default_radius_km} km</Text>
             </View>
+          </Card>
+        )}
+
+        {/* Plan history */}
+        {planHistory.length > 0 && (
+          <Card style={{ gap: spacing.md }}>
+            <Text variant="h3">{t('profile.planHistory') || 'Historique des plans'}</Text>
+            {planHistory.map((plan) => (
+              <Pressable
+                key={plan.id}
+                onPress={() => router.push({ pathname: '/plan/results', params: { planId: plan.id } })}
+                style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: spacing.xs }}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text variant="body">{plan.location_name || `${plan.radius_km} km`}</Text>
+                  <Text variant="caption" color={colors.textSecondary}>
+                    {new Date(plan.created_at).toLocaleDateString()}
+                  </Text>
+                </View>
+                {plan.total_estimated_cost && (
+                  <Text variant="caption" color={colors.accent}>~{plan.total_estimated_cost}€</Text>
+                )}
+              </Pressable>
+            ))}
           </Card>
         )}
 

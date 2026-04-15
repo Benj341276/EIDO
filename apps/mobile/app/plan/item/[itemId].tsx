@@ -1,6 +1,7 @@
 import { View, Image, Linking, Pressable } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Text, Button, Card, ScreenContainer } from '@/components/ui';
+import { FeedbackButtons } from '@/components/plan/FeedbackButtons';
 import { useTranslation } from '@/i18n';
 import { useColors } from '@/theme/useColors';
 import { spacing, radii } from '@/theme/spacing';
@@ -38,7 +39,10 @@ export default function PlanItemDetailScreen() {
         )}
 
         <View style={{ gap: spacing.xs }}>
-          <Text variant="h2">{item.name}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Text variant="h2" style={{ flex: 1 }}>{item.name}</Text>
+            {item.id && <FeedbackButtons planItemId={item.id} />}
+          </View>
           <View style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'center' }}>
             {item.rating && <Text variant="body" color={colors.accent}>★ {item.rating}</Text>}
             {item.estimated_cost && <Text variant="body" color={colors.textSecondary}>~{item.estimated_cost}€</Text>}

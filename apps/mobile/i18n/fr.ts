@@ -90,6 +90,7 @@ export const fr = {
   'profile.myPreferences': 'Mes préférences',
   'profile.language': 'Langue',
   'profile.editPreferences': 'Modifier mes préférences',
+  'profile.planHistory': 'Historique des plans',
 
   // Edit Preferences
   'editPrefs.title': 'Modifier mes préférences',

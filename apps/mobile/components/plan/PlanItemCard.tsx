@@ -1,5 +1,6 @@
 import { Pressable, View, Image } from 'react-native';
 import { Text } from '@/components/ui';
+import { FeedbackButtons } from './FeedbackButtons';
 import { useColors } from '@/theme/useColors';
 import { spacing, radii } from '@/theme/spacing';
 import type { PlanItem } from '@/stores/plan.store';
@@ -33,12 +34,11 @@ export function PlanItemCard({ item, onPress }: Props) {
           )}
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            {item.rating && (
-              <Text variant="caption" color={colors.accent}>★ {item.rating}</Text>
-            )}
-            {item.estimated_cost && (
-              <Text variant="caption" color={colors.textSecondary}>~{item.estimated_cost}€</Text>
-            )}
+            <View style={{ flexDirection: 'row', gap: spacing.sm, alignItems: 'center' }}>
+              {item.rating && <Text variant="caption" color={colors.accent}>★ {item.rating}</Text>}
+              {item.estimated_cost && <Text variant="caption" color={colors.textSecondary}>~{item.estimated_cost}€</Text>}
+            </View>
+            {item.id && <FeedbackButtons planItemId={item.id} />}
           </View>
         </View>
       </View>

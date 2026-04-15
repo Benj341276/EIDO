@@ -77,6 +77,7 @@ export const es: Record<string, string> = {
   'profile.myPreferences': 'Mis preferencias',
   'profile.language': 'Idioma',
   'profile.editPreferences': 'Editar mis preferencias',
+  'profile.planHistory': 'Historial de planes',
 
   'editPrefs.title': 'Editar mis preferencias',
   'editPrefs.cuisines': 'Cocinas',
