@@ -30,18 +30,42 @@ export function FeedbackButtons({ planItemId, initialLiked }: Props) {
   }
 
   return (
-    <View style={{ flexDirection: 'row', gap: spacing.md }}>
-      <Pressable onPress={() => handleFeedback(true)} hitSlop={8}>
+    <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+      <Pressable
+        onPress={() => handleFeedback(true)}
+        hitSlop={8}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 4,
+          paddingVertical: 4,
+          paddingHorizontal: 8,
+          borderRadius: 999,
+          backgroundColor: liked === true ? colors.success + '20' : 'transparent',
+        }}
+      >
         <Ionicons
-          name={liked === true ? 'thumbs-up' : 'thumbs-up-outline'}
-          size={22}
+          name={liked === true ? 'heart' : 'heart-outline'}
+          size={18}
           color={liked === true ? colors.success : colors.textTertiary}
         />
       </Pressable>
-      <Pressable onPress={() => handleFeedback(false)} hitSlop={8}>
+      <Pressable
+        onPress={() => handleFeedback(false)}
+        hitSlop={8}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 4,
+          paddingVertical: 4,
+          paddingHorizontal: 8,
+          borderRadius: 999,
+          backgroundColor: liked === false ? colors.error + '20' : 'transparent',
+        }}
+      >
         <Ionicons
-          name={liked === false ? 'thumbs-down' : 'thumbs-down-outline'}
-          size={22}
+          name={liked === false ? 'close-circle' : 'close-circle-outline'}
+          size={18}
           color={liked === false ? colors.error : colors.textTertiary}
         />
       </Pressable>

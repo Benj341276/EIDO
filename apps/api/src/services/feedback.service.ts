@@ -54,10 +54,10 @@ export function formatFeedbackForPrompt(summary: FeedbackSummary): string {
   const parts: string[] = [];
 
   if (summary.likedNames.length > 0) {
-    parts.push(`L'utilisateur a aimé : ${summary.likedNames.slice(0, 10).join(', ')}`);
+    parts.push(`L'utilisateur est intéressé par ce type de lieux : ${summary.likedNames.slice(0, 10).join(', ')}. Propose des lieux similaires.`);
   }
   if (summary.dislikedNames.length > 0) {
-    parts.push(`L'utilisateur n'a PAS aimé : ${summary.dislikedNames.slice(0, 10).join(', ')}. Évite des lieux similaires.`);
+    parts.push(`L'utilisateur n'est PAS intéressé par : ${summary.dislikedNames.slice(0, 10).join(', ')}. Évite des lieux similaires.`);
   }
 
   return parts.join('\n');
