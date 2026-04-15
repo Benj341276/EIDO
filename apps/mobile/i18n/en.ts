@@ -73,6 +73,7 @@ export const en: Record<string, string> = {
   'plan.events': 'Events',
   'plan.bookTickets': 'Book tickets',
   'plan.visitWebsite': 'Website',
+  'plan.costEstimate': 'Estimated budget per person (1 meal, 1 to 2 activities, 1 event)',
   'explore.comingSoon': 'Map coming soon',
 
   'profile.title': 'Profile',

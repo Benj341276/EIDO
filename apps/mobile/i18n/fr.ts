@@ -83,6 +83,7 @@ export const fr = {
   'plan.events': 'Événements',
   'plan.bookTickets': 'Réserver',
   'plan.visitWebsite': 'Site web',
+  'plan.costEstimate': 'Budget estimé par personne (1 repas, 1 à 2 activités, 1 événement)',
 
   // Explore
   'explore.comingSoon': 'Carte bientôt disponible',
