@@ -12,6 +12,7 @@ interface Props {
 
 export function PlanItemCard({ item, onPress }: Props) {
   const colors = useColors();
+  const eventDate = item.metadata?.event_date || (item.description?.startsWith('📅') ? item.description.slice(2).trim() : null);
 
   return (
     <Pressable onPress={onPress} style={{ width: 220, marginRight: spacing.md }}>
@@ -29,6 +30,18 @@ export function PlanItemCard({ item, onPress }: Props) {
         <View style={{ padding: spacing.md, gap: spacing.xs }}>
           <Text variant="body" weight="semibold" numberOfLines={1}>{item.name}</Text>
 
+          {/* Event date */}
+          {eventDate && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Text variant="caption" color={colors.accent} weight="semibold">📅 {eventDate}</Text>
+            </View>
+          )}
+
+          {/* Venue for events */}
+          {item.category === 'event' && item.address && (
+            <Text variant="caption" color={colors.textSecondary} numberOfLines={1}>📍 {item.address}</Text>
+          )}
+
           {item.reason && (
             <Text variant="caption" color={colors.textSecondary} numberOfLines={2}>{item.reason}</Text>
           )}
@@ -36,7 +49,7 @@ export function PlanItemCard({ item, onPress }: Props) {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <View style={{ flexDirection: 'row', gap: spacing.sm, alignItems: 'center' }}>
               {item.rating && <Text variant="caption" color={colors.accent}>★ {item.rating}</Text>}
-              {item.estimated_cost && <Text variant="caption" color={colors.textSecondary}>~{item.estimated_cost}€</Text>}
+              {item.estimated_cost != null && <Text variant="caption" color={colors.textSecondary}>~{item.estimated_cost}€</Text>}
             </View>
             {item.id && <FeedbackButtons planItemId={item.id} compact />}
           </View>

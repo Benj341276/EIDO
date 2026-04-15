@@ -7,6 +7,7 @@ export interface PlanItem {
   id: string;
   category: string;
   name: string;
+  description: string | null;
   reason: string | null;
   address: string | null;
   latitude: number | null;
@@ -17,6 +18,7 @@ export interface PlanItem {
   duration_minutes: number | null;
   image_url: string | null;
   external_url: string | null;
+  metadata: Record<string, any> | null;
   sort_order: number;
 }
 

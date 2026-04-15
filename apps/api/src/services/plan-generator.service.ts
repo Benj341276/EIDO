@@ -36,6 +36,7 @@ export interface PlanItemResult {
   image_url: string | null;
   external_url: string | null;
   external_id: string | null;
+  metadata: Record<string, any>;
   sort_order: number;
 }
 
@@ -120,13 +121,18 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
       const place = places.find((p) => p.id === aiItem.external_id);
       const event = eventsList.find((e) => e.id === aiItem.external_id);
 
+      // Build clean address (no GPS coordinates)
+      let address = place?.address ?? null;
+      if (!address && event?.venue) address = event.venue;
+      if (!address && event?.address) address = event.address;
+
       return {
         id: '',
         category,
         name: aiItem.name,
         description: event?.date ? `📅 ${event.date}` : null,
         reason: aiItem.reason,
-        address: place?.address ?? event?.address ?? event?.venue ?? null,
+        address,
         latitude: place?.lat ?? event?.lat ?? null,
         longitude: place?.lng ?? event?.lng ?? null,
         rating: place?.rating ?? null,
@@ -137,6 +143,13 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
         external_url: event?.ticketUrl ?? place?.googleMapsUrl ?? null,
         external_id: aiItem.external_id,
         sort_order: sortOrder++,
+        metadata: {
+          ...(event?.date ? { event_date: event.date } : {}),
+          ...(event?.ticketUrl ? { ticket_url: event.ticketUrl } : {}),
+          ...(event?.venue ? { venue: event.venue } : {}),
+          ...(event?.priceMin != null ? { price_min: event.priceMin } : {}),
+          ...(event?.priceMax != null ? { price_max: event.priceMax } : {}),
+        },
       };
     }
 
@@ -168,6 +181,8 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
           image_url: item.image_url,
           external_url: item.external_url,
           external_id: item.external_id,
+          description: item.description,
+          metadata: item.metadata,
           sort_order: item.sort_order,
         }))
       );
