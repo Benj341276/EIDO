@@ -55,11 +55,12 @@ export default function HomeScreen() {
 
   return (
     <ScreenContainer scroll={false} padding={false}>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.lg }}>
-        {/* Logo */}
-        <Image source={require('@/assets/images/eido-logo.png')} style={{ width: 220, height: 110, marginBottom: spacing['3xl'] }} resizeMode="contain" />
+      <View style={{ flex: 1, alignItems: 'center', padding: spacing.lg }}>
+        {/* Logo — haut de l'écran */}
+        <Image source={require('@/assets/images/eido-logo.png')} style={{ width: 280, height: 140, marginTop: spacing.xl }} resizeMode="contain" />
 
-        {/* CTA Button */}
+        {/* CTA Button — centré dans l'espace restant */}
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
         <Animated.View style={pulseStyle}>
           <Pressable
             onPress={handleGenerate}
@@ -93,6 +94,7 @@ export default function HomeScreen() {
           <Text variant="caption" color={colors.error} style={{ marginTop: spacing.md }} align="center">{usePlanStore.getState().error}</Text>
         ) : null}
 
+        </View>
         {/* Radius selector */}
         <View style={{ marginTop: spacing['2xl'], gap: spacing.sm, width: '100%', alignItems: 'center' }}>
           <Text variant="label" color={colors.textSecondary}>
