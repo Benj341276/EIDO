@@ -17,7 +17,7 @@ async function start() {
   // Routes
   await server.register(plansRoutes, { prefix: '/api/v1' });
 
-  server.get('/health', async () => ({ status: 'ok', version: '0.0.1' }));
+  server.get('/health', async () => ({ status: 'ok', version: '0.3.0-json' }));
 
   const port = Number(process.env.PORT) || 3001;
   await server.listen({ port, host: '0.0.0.0' });

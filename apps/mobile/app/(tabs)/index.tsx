@@ -5,12 +5,14 @@ import * as Location from 'expo-location';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { Text, ScreenContainer } from '@/components/ui';
 import { usePlanStore } from '@/stores/plan.store';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
 import { usePreferencesStore } from '@/stores/preferences.store';
 import { useTranslation } from '@/i18n';
 import { useColors } from '@/theme/useColors';
 import { spacing } from '@/theme/spacing';
 
-const RADIUS_OPTIONS = [1, 3, 5, 10, 25] as const;
+const RADIUS_OPTIONS = [1, 3, 5, 10, 25, 50] as const;
 
 export default function HomeScreen() {
   const colors = useColors();
@@ -45,10 +47,28 @@ export default function HomeScreen() {
     })();
   }, []);
 
+  const [debugMsg, setDebugMsg] = useState('');
+
   async function handleGenerate() {
     if (!location) return;
+    setDebugMsg('Appel API...');
+
+    // Test connectivity first
+    try {
+      const healthRes = await fetch(`${API_URL.replace('/api/v1', '')}/health`);
+      const healthText = await healthRes.text();
+      setDebugMsg(`Health: ${healthText}`);
+    } catch (err: any) {
+      setDebugMsg(`Connexion échouée: ${err.message}`);
+      return;
+    }
+
     await generatePlan(location.lat, location.lng, radius, language);
-    router.push('/plan/results');
+    if (usePlanStore.getState().error) {
+      setDebugMsg(`Erreur: ${usePlanStore.getState().error}`);
+    } else {
+      router.push('/plan/results');
+    }
   }
 
   return (
@@ -82,6 +102,10 @@ export default function HomeScreen() {
 
         {locationError ? (
           <Text variant="caption" color={colors.error} style={{ marginTop: spacing.md }}>{locationError}</Text>
+        ) : null}
+
+        {debugMsg ? (
+          <Text variant="caption" color={colors.accent} style={{ marginTop: spacing.md, paddingHorizontal: spacing.md }} align="center">{debugMsg}</Text>
         ) : null}
 
         {/* Radius selector */}

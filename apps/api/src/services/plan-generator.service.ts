@@ -72,7 +72,7 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
     const [restaurants, activities, events] = await Promise.all([
       searchNearby(latitude, longitude, radiusKm, 'restaurant'),
       searchNearby(latitude, longitude, radiusKm, 'activity'),
-      searchEvents(latitude, longitude, radiusKm),
+      searchEvents(latitude, longitude, radiusKm, locationName),
     ]);
 
     // 4. Call Claude to generate plan

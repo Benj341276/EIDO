@@ -21,10 +21,14 @@ export async function searchEvents(
   lat: number,
   lng: number,
   radiusKm: number,
+  cityName?: string,
 ): Promise<EventResult[]> {
-  // Try Ticketmaster first, then Eventbrite as fallback
   if (TICKETMASTER_KEY) {
-    const results = await searchTicketmaster(lat, lng, radiusKm);
+    // Try by geoloc first, then by city name as fallback
+    let results = await searchTicketmaster(lat, lng, radiusKm);
+    if (results.length === 0 && cityName) {
+      results = await searchTicketmasterByCity(cityName);
+    }
     if (results.length > 0) return results;
   }
 
@@ -42,6 +46,36 @@ async function searchTicketmaster(lat: number, lng: number, radiusKm: number): P
     const weekLater = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().replace(/\.\d+Z$/, 'Z');
 
     const url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${TICKETMASTER_KEY}&latlong=${lat},${lng}&radius=${radiusMiles}&unit=miles&size=10&sort=date,asc&startDateTime=${now}&endDateTime=${weekLater}`;
+
+    const res = await fetch(url);
+    if (!res.ok) return [];
+
+    const json = await res.json();
+    const events = json._embedded?.events ?? [];
+
+    return events.map((e: any) => ({
+      id: e.id,
+      name: e.name,
+      description: e.info ?? null,
+      date: e.dates?.start?.localDate ?? '',
+      venue: e._embedded?.venues?.[0]?.name ?? null,
+      address: e._embedded?.venues?.[0]?.address?.line1 ?? null,
+      lat: parseFloat(e._embedded?.venues?.[0]?.location?.latitude) || null,
+      lng: parseFloat(e._embedded?.venues?.[0]?.location?.longitude) || null,
+      priceMin: e.priceRanges?.[0]?.min ?? null,
+      priceMax: e.priceRanges?.[0]?.max ?? null,
+      imageUrl: e.images?.[0]?.url ?? null,
+      ticketUrl: e.url ?? null,
+      source: 'ticketmaster',
+    }));
+  } catch {
+    return [];
+  }
+}
+
+async function searchTicketmasterByCity(city: string): Promise<EventResult[]> {
+  try {
+    const url = `https://app.ticketmaster.com/discovery/v2/events.json?apikey=${TICKETMASTER_KEY}&city=${encodeURIComponent(city)}&size=10&sort=date,asc`;
 
     const res = await fetch(url);
     if (!res.ok) return [];

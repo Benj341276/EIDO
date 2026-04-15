@@ -1,15 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { Stack, useSegments, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
 import { useAuthStore } from '@/stores/auth.store';
 import { usePreferencesStore } from '@/stores/preferences.store';
 import { useThemeStore } from '@/stores/theme.store';
 import { useLanguageStore } from '@/stores/language.store';
 import { useColors } from '@/theme/useColors';
-
-SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const colors = useColors();
@@ -39,7 +36,6 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (isLoading) return;
-    SplashScreen.hideAsync().catch(() => {});
 
     const currentRoute = segments[0] ?? '';
     let target = '';
