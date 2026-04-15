@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { View, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Text } from '@/components/ui';
 import { useColors } from '@/theme/useColors';
-import { spacing } from '@/theme/spacing';
+import { useTranslation } from '@/i18n';
+import { spacing, radii } from '@/theme/spacing';
 import { getSupabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth.store';
 
 interface Props {
   planItemId: string;
   initialLiked?: boolean | null;
+  compact?: boolean;
 }
 
-export function FeedbackButtons({ planItemId, initialLiked }: Props) {
+export function FeedbackButtons({ planItemId, initialLiked, compact }: Props) {
   const colors = useColors();
+  const { t } = useTranslation();
   const [liked, setLiked] = useState<boolean | null>(initialLiked ?? null);
   const userId = useAuthStore((s) => s.user?.id);
 
@@ -29,45 +33,62 @@ export function FeedbackButtons({ planItemId, initialLiked }: Props) {
       );
   }
 
+  if (compact) {
+    return (
+      <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+        <Pressable onPress={() => handleFeedback(true)} hitSlop={8}
+          style={{ padding: 6, borderRadius: radii.full, backgroundColor: liked === true ? colors.success + '30' : colors.surface }}>
+          <Ionicons name={liked === true ? 'heart' : 'heart-outline'} size={20} color={liked === true ? colors.success : colors.textTertiary} />
+        </Pressable>
+        <Pressable onPress={() => handleFeedback(false)} hitSlop={8}
+          style={{ padding: 6, borderRadius: radii.full, backgroundColor: liked === false ? colors.error + '30' : colors.surface }}>
+          <Ionicons name={liked === false ? 'close-circle' : 'close-circle-outline'} size={20} color={liked === false ? colors.error : colors.textTertiary} />
+        </Pressable>
+      </View>
+    );
+  }
+
   return (
     <View style={{ flexDirection: 'row', gap: spacing.sm }}>
       <Pressable
         onPress={() => handleFeedback(true)}
-        hitSlop={8}
         style={{
+          flex: 1,
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 4,
-          paddingVertical: 4,
-          paddingHorizontal: 8,
-          borderRadius: 999,
+          justifyContent: 'center',
+          gap: spacing.sm,
+          paddingVertical: spacing.sm + 2,
+          borderRadius: radii.md,
+          borderWidth: 1,
+          borderColor: liked === true ? colors.success : colors.border,
           backgroundColor: liked === true ? colors.success + '20' : 'transparent',
         }}
       >
-        <Ionicons
-          name={liked === true ? 'heart' : 'heart-outline'}
-          size={18}
-          color={liked === true ? colors.success : colors.textTertiary}
-        />
+        <Ionicons name={liked === true ? 'heart' : 'heart-outline'} size={22} color={liked === true ? colors.success : colors.textSecondary} />
+        <Text variant="caption" weight="semibold" color={liked === true ? colors.success : colors.textSecondary}>
+          {t('plan.interested') || 'Intéressé'}
+        </Text>
       </Pressable>
       <Pressable
         onPress={() => handleFeedback(false)}
-        hitSlop={8}
         style={{
+          flex: 1,
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 4,
-          paddingVertical: 4,
-          paddingHorizontal: 8,
-          borderRadius: 999,
+          justifyContent: 'center',
+          gap: spacing.sm,
+          paddingVertical: spacing.sm + 2,
+          borderRadius: radii.md,
+          borderWidth: 1,
+          borderColor: liked === false ? colors.error : colors.border,
           backgroundColor: liked === false ? colors.error + '20' : 'transparent',
         }}
       >
-        <Ionicons
-          name={liked === false ? 'close-circle' : 'close-circle-outline'}
-          size={18}
-          color={liked === false ? colors.error : colors.textTertiary}
-        />
+        <Ionicons name={liked === false ? 'close-circle' : 'close-circle-outline'} size={22} color={liked === false ? colors.error : colors.textSecondary} />
+        <Text variant="caption" weight="semibold" color={liked === false ? colors.error : colors.textSecondary}>
+          {t('plan.notInterested') || 'Pas intéressé'}
+        </Text>
       </Pressable>
     </View>
   );

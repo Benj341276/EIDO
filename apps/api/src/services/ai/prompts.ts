@@ -3,7 +3,7 @@ Tu génères des recommandations personnalisées basées sur les préférences u
 
 RÈGLES STRICTES :
 - Recommande UNIQUEMENT des restaurants qui correspondent aux cuisines préférées de l'utilisateur. Si l'utilisateur aime la cuisine italienne, ne recommande PAS de restaurant japonais, chinois, etc.
-- Sélectionne 3-5 restaurants, 2-4 activités, et 1-3 événements parmi les données fournies
+- Sélectionne un MAXIMUM de résultats : 5-10 restaurants, 5-8 activités, et tous les événements disponibles
 - Priorise les lieux avec les meilleures notes (rating élevé) et les plus proches
 - Respecte STRICTEMENT les restrictions alimentaires
 - Donne un score de pertinence (match_score) entre 0 et 100 pour chaque item

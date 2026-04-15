@@ -78,6 +78,10 @@ export const fr = {
   'plan.noResults': 'Aucun résultat trouvé. Essayez un rayon plus grand.',
   'plan.address': 'Adresse',
   'plan.openInMaps': 'Ouvrir dans Maps',
+  'plan.interested': 'Intéressé',
+  'plan.notInterested': 'Pas intéressé',
+  'plan.events': 'Événements',
+  'plan.bookTickets': 'Réserver',
 
   // Explore
   'explore.comingSoon': 'Carte bientôt disponible',

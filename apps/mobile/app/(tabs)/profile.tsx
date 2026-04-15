@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { View, Pressable } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, Button, Card, ScreenContainer } from '@/components/ui';
@@ -26,16 +27,18 @@ export default function ProfileScreen() {
 
   const [planHistory, setPlanHistory] = useState<any[]>([]);
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await getSupabase()
-        .from('plans')
-        .select('id, location_name, radius_km, status, total_estimated_cost, created_at')
-        .order('created_at', { ascending: false })
-        .limit(10);
-      if (data) setPlanHistory(data);
-    })();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        const { data } = await getSupabase()
+          .from('plans')
+          .select('id, location_name, radius_km, status, total_estimated_cost, created_at')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        if (data) setPlanHistory(data);
+      })();
+    }, [])
+  );
 
   function tCategory(prefix: string, key: string) { return t(`${prefix}.${key}`); }
 

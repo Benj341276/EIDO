@@ -73,15 +73,15 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
     const cuisinePrefs: string[] = prefs?.cuisines ?? [];
     const hasCuisinePrefs = cuisinePrefs.length > 0;
 
+    // Always search both cuisine-specific AND generic nearby for maximum results
     const [cuisineRestaurants, nearbyRestaurants, activities, events] = await Promise.all([
       hasCuisinePrefs ? searchByCuisine(latitude, longitude, radiusKm, cuisinePrefs) : Promise.resolve([]),
-      // Only fetch generic restaurants if user has no cuisine preferences
-      !hasCuisinePrefs ? searchNearby(latitude, longitude, radiusKm, 'restaurant') : Promise.resolve([]),
+      searchNearby(latitude, longitude, radiusKm, 'restaurant'),
       searchNearby(latitude, longitude, radiusKm, 'activity'),
       searchEvents(latitude, longitude, radiusKm, locationName),
     ]);
 
-    // Use cuisine results if available, otherwise generic nearby
+    // Merge: cuisine results first (prioritized), then nearby
     const seenIds = new Set<string>();
     const restaurants: PlaceResult[] = [];
     for (const r of [...cuisineRestaurants, ...nearbyRestaurants]) {
@@ -124,17 +124,17 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
         id: '',
         category,
         name: aiItem.name,
-        description: null,
+        description: event?.date ? `📅 ${event.date}` : null,
         reason: aiItem.reason,
-        address: place?.address ?? event?.address ?? null,
+        address: place?.address ?? event?.address ?? event?.venue ?? null,
         latitude: place?.lat ?? event?.lat ?? null,
         longitude: place?.lng ?? event?.lng ?? null,
         rating: place?.rating ?? null,
         price_level: place?.priceLevel ?? null,
-        estimated_cost: aiItem.estimated_cost ?? null,
+        estimated_cost: aiItem.estimated_cost ?? event?.priceMin ?? null,
         duration_minutes: aiItem.duration_minutes ?? null,
         image_url: place?.photoUrl ?? event?.imageUrl ?? null,
-        external_url: place?.googleMapsUrl ?? event?.ticketUrl ?? null,
+        external_url: event?.ticketUrl ?? place?.googleMapsUrl ?? null,
         external_id: aiItem.external_id,
         sort_order: sortOrder++,
       };

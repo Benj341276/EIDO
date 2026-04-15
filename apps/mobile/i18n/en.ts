@@ -68,6 +68,10 @@ export const en: Record<string, string> = {
   'plan.noResults': 'No results found. Try a larger radius.',
   'plan.address': 'Address',
   'plan.openInMaps': 'Open in Maps',
+  'plan.interested': 'Interested',
+  'plan.notInterested': 'Not interested',
+  'plan.events': 'Events',
+  'plan.bookTickets': 'Book tickets',
   'explore.comingSoon': 'Map coming soon',
 
   'profile.title': 'Profile',

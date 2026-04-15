@@ -38,7 +38,7 @@ export function PlanItemCard({ item, onPress }: Props) {
               {item.rating && <Text variant="caption" color={colors.accent}>★ {item.rating}</Text>}
               {item.estimated_cost && <Text variant="caption" color={colors.textSecondary}>~{item.estimated_cost}€</Text>}
             </View>
-            {item.id && <FeedbackButtons planItemId={item.id} />}
+            {item.id && <FeedbackButtons planItemId={item.id} compact />}
           </View>
         </View>
       </View>
