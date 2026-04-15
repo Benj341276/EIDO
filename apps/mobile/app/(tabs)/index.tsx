@@ -5,8 +5,6 @@ import * as Location from 'expo-location';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { Text, ScreenContainer } from '@/components/ui';
 import { usePlanStore } from '@/stores/plan.store';
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
 import { usePreferencesStore } from '@/stores/preferences.store';
 import { useTranslation } from '@/i18n';
 import { useColors } from '@/theme/useColors';
@@ -18,7 +16,7 @@ export default function HomeScreen() {
   const colors = useColors();
   const router = useRouter();
   const { t, language } = useTranslation();
-  const { isGenerating, generatePlan, items } = usePlanStore();
+  const { isGenerating, generatePlan } = usePlanStore();
   const preferences = usePreferencesStore((s) => s.preferences);
   const [radius, setRadius] = useState(preferences?.default_radius_km ?? 5);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -47,26 +45,10 @@ export default function HomeScreen() {
     })();
   }, []);
 
-  const [debugMsg, setDebugMsg] = useState('');
-
   async function handleGenerate() {
     if (!location) return;
-    setDebugMsg('Appel API...');
-
-    // Test connectivity first
-    try {
-      const healthRes = await fetch(`${API_URL.replace('/api/v1', '')}/health`);
-      const healthText = await healthRes.text();
-      setDebugMsg(`Health: ${healthText}`);
-    } catch (err: any) {
-      setDebugMsg(`Connexion échouée: ${err.message}`);
-      return;
-    }
-
     await generatePlan(location.lat, location.lng, radius, language);
-    if (usePlanStore.getState().error) {
-      setDebugMsg(`Erreur: ${usePlanStore.getState().error}`);
-    } else {
+    if (!usePlanStore.getState().error) {
       router.push('/plan/results');
     }
   }
@@ -75,7 +57,7 @@ export default function HomeScreen() {
     <ScreenContainer scroll={false} padding={false}>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.lg }}>
         {/* Logo */}
-        <Image source={require('@/assets/images/eido-logo.png')} style={{ width: 160, height: 80, marginBottom: spacing.xl }} resizeMode="contain" />
+        <Image source={require('@/assets/images/eido-logo.png')} style={{ width: 220, height: 110, marginBottom: spacing['3xl'] }} resizeMode="contain" />
 
         {/* CTA Button */}
         <Animated.View style={pulseStyle}>
@@ -107,8 +89,8 @@ export default function HomeScreen() {
           <Text variant="caption" color={colors.error} style={{ marginTop: spacing.md }}>{locationError}</Text>
         ) : null}
 
-        {debugMsg ? (
-          <Text variant="caption" color={colors.accent} style={{ marginTop: spacing.md, paddingHorizontal: spacing.md }} align="center">{debugMsg}</Text>
+        {usePlanStore.getState().error ? (
+          <Text variant="caption" color={colors.error} style={{ marginTop: spacing.md }} align="center">{usePlanStore.getState().error}</Text>
         ) : null}
 
         {/* Radius selector */}

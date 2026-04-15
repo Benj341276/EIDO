@@ -12,9 +12,12 @@ export const MUSIC_GENRE_OPTIONS = [
 
 export const ACTIVITY_OPTIONS = [
   'beach', 'mountain', 'urban', 'countryside',
+  'hiking', 'walking', 'running', 'cycling_activity',
   'museums', 'shows', 'sports', 'wellness', 'nightlife',
-  'food_tours', 'parks', 'cinema', 'concerts', 'theater',
-  'video_games', 'pinball', 'foosball',
+  'food_tours', 'wine_spirits', 'parks', 'cinema', 'concerts', 'theater',
+  'sailing', 'canoeing', 'paddle', 'boating',
+  'theme_parks', 'kids_playground', 'karting', 'motocross', 'motorcycle',
+  'model_building', 'video_games', 'pinball', 'foosball',
   'escape_rooms', 'cooking_classes', 'creative_workshops', 'comedy',
 ] as const;
 
