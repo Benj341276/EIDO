@@ -70,14 +70,17 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
   try {
     // 3. Fetch external data in parallel
     const cuisinePrefs: string[] = prefs?.cuisines ?? [];
-    const [nearbyRestaurants, cuisineRestaurants, activities, events] = await Promise.all([
-      searchNearby(latitude, longitude, radiusKm, 'restaurant'),
-      searchByCuisine(latitude, longitude, radiusKm, cuisinePrefs),
+    const hasCuisinePrefs = cuisinePrefs.length > 0;
+
+    const [cuisineRestaurants, nearbyRestaurants, activities, events] = await Promise.all([
+      hasCuisinePrefs ? searchByCuisine(latitude, longitude, radiusKm, cuisinePrefs) : Promise.resolve([]),
+      // Only fetch generic restaurants if user has no cuisine preferences
+      !hasCuisinePrefs ? searchNearby(latitude, longitude, radiusKm, 'restaurant') : Promise.resolve([]),
       searchNearby(latitude, longitude, radiusKm, 'activity'),
       searchEvents(latitude, longitude, radiusKm, locationName),
     ]);
 
-    // Merge restaurants, deduplicate by ID
+    // Use cuisine results if available, otherwise generic nearby
     const seenIds = new Set<string>();
     const restaurants: PlaceResult[] = [];
     for (const r of [...cuisineRestaurants, ...nearbyRestaurants]) {
