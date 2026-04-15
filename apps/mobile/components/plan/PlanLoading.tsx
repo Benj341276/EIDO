@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { View, Image } from 'react-native';
 import Animated, {
   useSharedValue, useAnimatedStyle,
   withRepeat, withSequence, withTiming,
@@ -26,6 +26,8 @@ export function PlanLoading() {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.lg }}>
+      <Image source={require('@/assets/images/eido-logo.png')} style={{ width: 140, height: 70, marginBottom: spacing.xl }} resizeMode="contain" />
+
       <View style={{ width: 120, height: 120, justifyContent: 'center', alignItems: 'center' }}>
         <Animated.View style={[{ position: 'absolute', width: 120, height: 120, borderRadius: 60, borderWidth: 2, borderColor: colors.accent }, ring1Style]} />
         <Animated.View style={[{ position: 'absolute', width: 80, height: 80, borderRadius: 40, borderWidth: 2, borderColor: colors.accentLight }, ring2Style]} />

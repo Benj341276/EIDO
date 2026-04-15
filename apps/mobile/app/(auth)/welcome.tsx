@@ -12,10 +12,8 @@ export default function WelcomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', padding: spacing.lg }}>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: spacing.md }}>
-        <Image source={require('@/assets/images/icon.png')} style={{ width: 80, height: 80, borderRadius: 20 }} />
-        <Text variant="h1" align="center">EIDO Life</Text>
-        <Text variant="body" color={colors.textSecondary} align="center">{t('welcome.subtitle')}</Text>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: spacing.lg }}>
+        <Image source={require('@/assets/images/eido-logo.png')} style={{ width: 200, height: 100 }} resizeMode="contain" />
       </View>
       <View style={{ width: '100%', gap: spacing.md, paddingBottom: spacing['2xl'] }}>
         <Button title={t('welcome.getStarted')} onPress={() => router.push('/(auth)/sign-up')} size="lg" />

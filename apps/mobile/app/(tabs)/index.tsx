@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Pressable, ScrollView } from 'react-native';
+import { View, Pressable, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
@@ -74,6 +74,9 @@ export default function HomeScreen() {
   return (
     <ScreenContainer scroll={false} padding={false}>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.lg }}>
+        {/* Logo */}
+        <Image source={require('@/assets/images/eido-logo.png')} style={{ width: 160, height: 80, marginBottom: spacing.xl }} resizeMode="contain" />
+
         {/* CTA Button */}
         <Animated.View style={pulseStyle}>
           <Pressable
@@ -109,22 +112,24 @@ export default function HomeScreen() {
         ) : null}
 
         {/* Radius selector */}
-        <View style={{ marginTop: spacing['2xl'], gap: spacing.sm, alignItems: 'center' }}>
+        <View style={{ marginTop: spacing['2xl'], gap: spacing.sm, width: '100%', alignItems: 'center' }}>
           <Text variant="label" color={colors.textSecondary}>
             {t('home.radius') || 'Rayon'} : {radius} km
           </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingHorizontal: spacing.sm }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm }}>
             {RADIUS_OPTIONS.map((r) => (
               <Pressable
                 key={r}
                 onPress={() => setRadius(r)}
                 style={{
+                  minWidth: 52,
                   paddingVertical: spacing.sm,
                   paddingHorizontal: spacing.md,
                   borderRadius: 999,
                   borderWidth: 1,
                   borderColor: radius === r ? colors.accent : colors.border,
                   backgroundColor: radius === r ? colors.accentMuted : 'transparent',
+                  alignItems: 'center',
                 }}
               >
                 <Text variant="caption" weight="medium" color={radius === r ? colors.accent : colors.textSecondary}>
@@ -132,7 +137,7 @@ export default function HomeScreen() {
                 </Text>
               </Pressable>
             ))}
-          </ScrollView>
+          </View>
         </View>
       </View>
     </ScreenContainer>
