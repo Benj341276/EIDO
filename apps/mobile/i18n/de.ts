@@ -72,6 +72,7 @@ export const de: Record<string, string> = {
   'plan.notInterested': 'Nicht interessiert',
   'plan.events': 'Veranstaltungen',
   'plan.bookTickets': 'Tickets buchen',
+  'plan.visitWebsite': 'Webseite',
   'explore.comingSoon': 'Karte bald verfügbar',
 
   'profile.title': 'Profil',

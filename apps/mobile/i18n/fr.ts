@@ -82,6 +82,7 @@ export const fr = {
   'plan.notInterested': 'Pas intéressé',
   'plan.events': 'Événements',
   'plan.bookTickets': 'Réserver',
+  'plan.visitWebsite': 'Site web',
 
   // Explore
   'explore.comingSoon': 'Carte bientôt disponible',

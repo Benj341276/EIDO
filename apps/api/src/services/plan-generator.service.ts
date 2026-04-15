@@ -140,10 +140,15 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
         estimated_cost: aiItem.estimated_cost ?? event?.priceMin ?? null,
         duration_minutes: aiItem.duration_minutes ?? null,
         image_url: place?.photoUrl ?? event?.imageUrl ?? null,
-        external_url: event?.ticketUrl ?? place?.googleMapsUrl ?? null,
+        // external_url = fiche Google Maps (pour restaurants/activités)
+        external_url: place?.googleMapsUrl ?? null,
         external_id: aiItem.external_id,
         sort_order: sortOrder++,
         metadata: {
+          // Liens
+          ...(place?.googleMapsUrl ? { google_maps_url: place.googleMapsUrl } : {}),
+          ...(place?.websiteUrl ? { website_url: place.websiteUrl } : {}),
+          // Events
           ...(event?.date ? { event_date: event.date } : {}),
           ...(event?.ticketUrl ? { ticket_url: event.ticketUrl } : {}),
           ...(event?.venue ? { venue: event.venue } : {}),

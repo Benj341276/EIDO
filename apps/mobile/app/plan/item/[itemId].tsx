@@ -16,23 +16,13 @@ export default function PlanItemDetailScreen() {
   if (!item) return null;
 
   const eventDate = item.metadata?.event_date || (item.description?.startsWith('📅') ? item.description.slice(2).trim() : null);
-  const ticketUrl = item.metadata?.ticket_url || (item.category === 'event' ? item.external_url : null);
+  const ticketUrl = item.metadata?.ticket_url;
   const venue = item.metadata?.venue;
+  const googleMapsUrl = item.metadata?.google_maps_url ?? item.external_url;
+  const websiteUrl = item.metadata?.website_url;
   const priceRange = item.metadata?.price_min != null && item.metadata?.price_max != null
     ? `${item.metadata.price_min}–${item.metadata.price_max}€`
     : null;
-
-  function openInMaps() {
-    if (item.latitude && item.longitude) {
-      Linking.openURL(`https://maps.google.com/?q=${item.latitude},${item.longitude}`);
-    } else if (item.external_url && item.category !== 'event') {
-      Linking.openURL(item.external_url);
-    }
-  }
-
-  function openTickets() {
-    if (ticketUrl) Linking.openURL(ticketUrl);
-  }
 
   return (
     <ScreenContainer>
@@ -48,22 +38,15 @@ export default function PlanItemDetailScreen() {
         <View style={{ gap: spacing.sm }}>
           <Text variant="h2">{item.name}</Text>
 
-          {/* Event specific info */}
           {eventDate && (
             <View style={{ backgroundColor: colors.accentMuted, paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radii.md, alignSelf: 'flex-start' }}>
               <Text variant="body" weight="semibold" color={colors.accent}>📅 {eventDate}</Text>
             </View>
           )}
 
-          {venue && (
-            <Text variant="body" color={colors.textSecondary}>📍 {venue}</Text>
-          )}
+          {venue && <Text variant="body" color={colors.textSecondary}>📍 {venue}</Text>}
+          {priceRange && <Text variant="body" color={colors.textSecondary}>💰 {priceRange}</Text>}
 
-          {priceRange && (
-            <Text variant="body" color={colors.textSecondary}>💰 {priceRange}</Text>
-          )}
-
-          {/* Rating, cost, duration */}
           <View style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'center' }}>
             {item.rating && <Text variant="body" color={colors.accent}>★ {item.rating}</Text>}
             {item.estimated_cost != null && !priceRange && <Text variant="body" color={colors.textSecondary}>~{item.estimated_cost}€</Text>}
@@ -71,7 +54,6 @@ export default function PlanItemDetailScreen() {
           </View>
         </View>
 
-        {/* Feedback */}
         {item.id && <FeedbackButtons planItemId={item.id} />}
 
         {item.reason && (
@@ -87,20 +69,29 @@ export default function PlanItemDetailScreen() {
           </View>
         )}
 
-        {/* Booking button for events */}
+        {/* Bouton 1: Réserver (événements uniquement) */}
         {ticketUrl && (
           <Button
             title={t('plan.bookTickets') || 'Réserver'}
-            onPress={openTickets}
+            onPress={() => Linking.openURL(ticketUrl)}
           />
         )}
 
-        {/* Maps button */}
-        {(item.latitude || item.external_url) && (
+        {/* Bouton 2: Fiche Google Maps (photos, avis, itinéraire) */}
+        {googleMapsUrl && (
           <Button
-            title={t('plan.openInMaps') || 'Ouvrir dans Maps'}
-            onPress={openInMaps}
+            title={t('plan.openInMaps') || 'Voir sur Google Maps'}
+            onPress={() => Linking.openURL(googleMapsUrl)}
             variant="secondary"
+          />
+        )}
+
+        {/* Bouton 3: Site web du lieu */}
+        {websiteUrl && (
+          <Button
+            title={t('plan.visitWebsite') || 'Site web'}
+            onPress={() => Linking.openURL(websiteUrl)}
+            variant="ghost"
           />
         )}
       </View>
