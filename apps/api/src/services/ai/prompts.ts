@@ -9,7 +9,7 @@ RÈGLES STRICTES :
 - Donne un score de pertinence (match_score) entre 0 et 100 pour chaque item
 - Estime un coût réaliste par item basé sur le price_level et la localisation
 - Fournis une raison courte et engageante pour chaque recommandation (dans la langue de l'utilisateur)
-- Estime le coût total de la journée (min et max)
+- ESTIMATION DU COÛT JOURNÉE : calcule le coût pour une journée RÉALISTE d'une personne = 1 restaurant + 1-2 activités + 1 événement maximum. NE PAS additionner tous les items proposés.
 - Si peu de données disponibles, recommande ce qu'il y a de mieux plutôt que de forcer des résultats
 - Ne recommande JAMAIS un lieu qui ne correspond pas aux préférences de l'utilisateur`;
 
