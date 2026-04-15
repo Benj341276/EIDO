@@ -16,7 +16,8 @@ export const ACTIVITY_OPTIONS = [
   'museums', 'shows', 'sports', 'wellness', 'nightlife',
   'food_tours', 'wine_spirits', 'parks', 'cinema', 'concerts', 'theater',
   'sailing', 'canoeing', 'paddle', 'boating',
-  'theme_parks', 'kids_playground', 'karting', 'motocross', 'motorcycle',
+  'theme_parks', 'kids_playground', 'karting', 'motocross', 'motorcycle', 'quad',
+  'horse_riding', 'unusual_activities', 'private_beach',
   'model_building', 'video_games', 'pinball', 'foosball',
   'escape_rooms', 'cooking_classes', 'creative_workshops', 'comedy',
 ] as const;
