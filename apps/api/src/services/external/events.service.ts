@@ -54,7 +54,7 @@ async function searchPredictHQ(lat: number, lng: number, radiusKm: number): Prom
     const monthLater = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const offsetKm = `${radiusKm}km`;
 
-    const url = `https://api.predicthq.com/v1/events/?location_around.origin=${lat},${lng}&location_around.offset=${offsetKm}&start.gte=${now}&start.lte=${monthLater}&category=concerts,festivals,performing-arts,sports,community,expos&limit=10&sort=start`;
+    const url = `https://api.predicthq.com/v1/events/?within=${offsetKm}@${lat},${lng}&start.gte=${now}&start.lte=${monthLater}&category=concerts,festivals,performing-arts,sports,community,expos&limit=10&sort=start`;
 
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${PREDICTHQ_KEY}` },
@@ -65,25 +65,40 @@ async function searchPredictHQ(lat: number, lng: number, radiusKm: number): Prom
     }
 
     const json = await res.json();
-    return (json.results ?? []).map((e: any) => ({
-      id: `phq_${e.id}`,
-      name: e.title,
-      description: e.description?.slice(0, 200) ?? null,
-      date: e.start?.split('T')[0] ?? '',
-      venue: e.entities?.[0]?.name ?? null,
-      address: e.location?.[1] ? `${e.location[1]}, ${e.location[0]}` : null,
-      lat: e.location?.[1] ?? null,
-      lng: e.location?.[0] ?? null,
-      priceMin: null,
-      priceMax: null,
-      imageUrl: null,
-      ticketUrl: null,
-      source: 'predicthq',
-    }));
+    return (json.results ?? [])
+      .filter((e: any) => {
+        // Post-filter: verify event is actually within radius
+        if (!e.location) return false;
+        const dist = haversineKm(lat, lng, e.location[1], e.location[0]);
+        return dist <= radiusKm;
+      })
+      .map((e: any) => ({
+        id: `phq_${e.id}`,
+        name: e.title,
+        description: e.description?.slice(0, 200) ?? null,
+        date: e.start?.split('T')[0] ?? '',
+        venue: e.entities?.[0]?.name ?? null,
+        address: null,
+        lat: e.location?.[1] ?? null,
+        lng: e.location?.[0] ?? null,
+        priceMin: null,
+        priceMax: null,
+        imageUrl: null,
+        ticketUrl: null,
+        source: 'predicthq',
+      }));
   } catch (err) {
     console.error('[PredictHQ] Fetch error:', err);
     return [];
   }
+}
+
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 // --- Ticketmaster (supplement) ---

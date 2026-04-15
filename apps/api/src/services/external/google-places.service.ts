@@ -1,7 +1,8 @@
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY!;
-const BASE_URL = 'https://places.googleapis.com/v1/places:searchNearby';
+const NEARBY_URL = 'https://places.googleapis.com/v1/places:searchNearby';
+const TEXT_URL = 'https://places.googleapis.com/v1/places:searchText';
 
-// In-memory cache: key = "lat,lng,radius,type" → { data, expiry }
+// In-memory cache
 const cache = new Map<string, { data: PlaceResult[]; expiry: number }>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
@@ -19,39 +20,94 @@ export interface PlaceResult {
   websiteUrl: string | null;
 }
 
+const FIELD_MASK = 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.priceLevel,places.types,places.photos,places.googleMapsUri,places.websiteUri';
+
 const TYPE_MAP: Record<string, string[]> = {
-  restaurant: ['restaurant', 'cafe', 'bar', 'bakery'],
+  restaurant: ['restaurant'],
   activity: ['museum', 'art_gallery', 'park', 'gym', 'spa', 'movie_theater', 'bowling_alley', 'amusement_park', 'zoo', 'aquarium', 'stadium', 'tourist_attraction'],
 };
 
-function cacheKey(lat: number, lng: number, radius: number, category: string): string {
-  return `${lat.toFixed(3)},${lng.toFixed(3)},${radius},${category}`;
+// Types to exclude (shopping centers, generic places)
+const EXCLUDED_TYPES = ['shopping_mall', 'department_store', 'supermarket', 'grocery_or_supermarket', 'convenience_store'];
+
+function cacheKey(...parts: (string | number)[]): string {
+  return parts.map(String).join(':');
 }
 
+// Standard nearby search
 export async function searchNearby(
   lat: number,
   lng: number,
   radiusKm: number,
   category: 'restaurant' | 'activity',
 ): Promise<PlaceResult[]> {
-  const key = cacheKey(lat, lng, radiusKm, category);
+  const key = cacheKey('nearby', lat.toFixed(3), lng.toFixed(3), radiusKm, category);
   const cached = cache.get(key);
   if (cached && cached.expiry > Date.now()) return cached.data;
 
   const radiusMeters = Math.min(radiusKm * 1000, 50000);
   const includedTypes = TYPE_MAP[category] ?? ['restaurant'];
 
+  const places = await fetchNearby(lat, lng, radiusMeters, includedTypes);
+  const filtered = filterPlaces(places);
+
+  cache.set(key, { data: filtered, expiry: Date.now() + CACHE_TTL });
+  return filtered;
+}
+
+// Text search for specific cuisine preferences (e.g. "restaurant italien Montpellier")
+export async function searchByCuisine(
+  lat: number,
+  lng: number,
+  radiusKm: number,
+  cuisineKeys: string[],
+): Promise<PlaceResult[]> {
+  if (cuisineKeys.length === 0) return [];
+
+  const key = cacheKey('cuisine', lat.toFixed(3), lng.toFixed(3), radiusKm, cuisineKeys.join(','));
+  const cached = cache.get(key);
+  if (cached && cached.expiry > Date.now()) return cached.data;
+
+  // Search for top 3 preferred cuisines
+  const topCuisines = cuisineKeys.slice(0, 3);
+  const allResults: PlaceResult[] = [];
+
+  for (const cuisine of topCuisines) {
+    const results = await fetchTextSearch(
+      `restaurant ${cuisine}`,
+      lat, lng, radiusKm * 1000,
+    );
+    allResults.push(...results);
+  }
+
+  // Deduplicate by place ID
+  const seen = new Set<string>();
+  const unique = allResults.filter((p) => {
+    if (seen.has(p.id)) return false;
+    seen.add(p.id);
+    return true;
+  });
+
+  const filtered = filterPlaces(unique);
+  cache.set(key, { data: filtered, expiry: Date.now() + CACHE_TTL });
+  return filtered;
+}
+
+// --- Internal fetch functions ---
+
+async function fetchNearby(lat: number, lng: number, radiusMeters: number, types: string[]): Promise<PlaceResult[]> {
   try {
-    const res = await fetch(BASE_URL, {
+    const res = await fetch(NEARBY_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': API_KEY,
-        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.priceLevel,places.types,places.photos,places.googleMapsUri,places.websiteUri',
+        'X-Goog-FieldMask': FIELD_MASK,
       },
       body: JSON.stringify({
-        includedTypes,
+        includedTypes: types,
         maxResultCount: 20,
+        rankPreference: 'DISTANCE',
         locationRestriction: {
           circle: {
             center: { latitude: lat, longitude: lng },
@@ -62,33 +118,79 @@ export async function searchNearby(
     });
 
     if (!res.ok) {
-      console.error('[GooglePlaces] Error:', res.status, await res.text());
+      console.error('[GooglePlaces] Nearby error:', res.status, await res.text());
       return [];
     }
 
     const json = await res.json();
-    const places: PlaceResult[] = (json.places ?? []).map((p: any) => ({
-      id: p.id,
-      name: p.displayName?.text ?? '',
-      address: p.formattedAddress ?? '',
-      lat: p.location?.latitude ?? 0,
-      lng: p.location?.longitude ?? 0,
-      rating: p.rating ?? null,
-      priceLevel: priceLevelToNumber(p.priceLevel),
-      types: p.types ?? [],
-      photoUrl: p.photos?.[0]?.name
-        ? `https://places.googleapis.com/v1/${p.photos[0].name}/media?key=${API_KEY}&maxWidthPx=400`
-        : null,
-      googleMapsUrl: p.googleMapsUri ?? null,
-      websiteUrl: p.websiteUri ?? null,
-    }));
-
-    cache.set(key, { data: places, expiry: Date.now() + CACHE_TTL });
-    return places;
+    return parsePlaces(json.places ?? []);
   } catch (err) {
-    console.error('[GooglePlaces] Fetch error:', err);
+    console.error('[GooglePlaces] Nearby fetch error:', err);
     return [];
   }
+}
+
+async function fetchTextSearch(query: string, lat: number, lng: number, radiusMeters: number): Promise<PlaceResult[]> {
+  try {
+    const res = await fetch(TEXT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': API_KEY,
+        'X-Goog-FieldMask': FIELD_MASK,
+      },
+      body: JSON.stringify({
+        textQuery: query,
+        maxResultCount: 10,
+        locationBias: {
+          circle: {
+            center: { latitude: lat, longitude: lng },
+            radius: radiusMeters,
+          },
+        },
+      }),
+    });
+
+    if (!res.ok) {
+      console.error('[GooglePlaces] Text search error:', res.status);
+      return [];
+    }
+
+    const json = await res.json();
+    return parsePlaces(json.places ?? []);
+  } catch (err) {
+    console.error('[GooglePlaces] Text search error:', err);
+    return [];
+  }
+}
+
+function parsePlaces(raw: any[]): PlaceResult[] {
+  return raw.map((p) => ({
+    id: p.id,
+    name: p.displayName?.text ?? '',
+    address: p.formattedAddress ?? '',
+    lat: p.location?.latitude ?? 0,
+    lng: p.location?.longitude ?? 0,
+    rating: p.rating ?? null,
+    priceLevel: priceLevelToNumber(p.priceLevel),
+    types: p.types ?? [],
+    photoUrl: p.photos?.[0]?.name
+      ? `https://places.googleapis.com/v1/${p.photos[0].name}/media?key=${API_KEY}&maxWidthPx=400`
+      : null,
+    googleMapsUrl: p.googleMapsUri ?? null,
+    websiteUrl: p.websiteUri ?? null,
+  }));
+}
+
+function filterPlaces(places: PlaceResult[]): PlaceResult[] {
+  return places.filter((p) => {
+    // Exclude shopping malls, supermarkets etc.
+    const hasExcluded = p.types.some((t) => EXCLUDED_TYPES.includes(t));
+    if (hasExcluded && !p.types.includes('restaurant')) return false;
+    // Must have a name
+    if (!p.name) return false;
+    return true;
+  });
 }
 
 function priceLevelToNumber(level: string | undefined): number | null {

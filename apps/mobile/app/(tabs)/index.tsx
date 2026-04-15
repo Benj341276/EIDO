@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Pressable } from 'react-native';
+import { View, Pressable, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
@@ -113,7 +113,7 @@ export default function HomeScreen() {
           <Text variant="label" color={colors.textSecondary}>
             {t('home.radius') || 'Rayon'} : {radius} km
           </Text>
-          <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingHorizontal: spacing.sm }}>
             {RADIUS_OPTIONS.map((r) => (
               <Pressable
                 key={r}
@@ -132,7 +132,7 @@ export default function HomeScreen() {
                 </Text>
               </Pressable>
             ))}
-          </View>
+          </ScrollView>
         </View>
       </View>
     </ScreenContainer>

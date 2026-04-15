@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { searchNearby, PlaceResult } from './external/google-places.service';
+import { searchNearby, searchByCuisine, PlaceResult } from './external/google-places.service';
 import { searchEvents, EventResult } from './external/events.service';
 import { generatePlan, GeneratedItem } from './ai/claude.service';
 
@@ -69,11 +69,23 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
 
   try {
     // 3. Fetch external data in parallel
-    const [restaurants, activities, events] = await Promise.all([
+    const cuisinePrefs: string[] = prefs?.cuisines ?? [];
+    const [nearbyRestaurants, cuisineRestaurants, activities, events] = await Promise.all([
       searchNearby(latitude, longitude, radiusKm, 'restaurant'),
+      searchByCuisine(latitude, longitude, radiusKm, cuisinePrefs),
       searchNearby(latitude, longitude, radiusKm, 'activity'),
       searchEvents(latitude, longitude, radiusKm, locationName),
     ]);
+
+    // Merge restaurants, deduplicate by ID
+    const seenIds = new Set<string>();
+    const restaurants: PlaceResult[] = [];
+    for (const r of [...cuisineRestaurants, ...nearbyRestaurants]) {
+      if (!seenIds.has(r.id)) {
+        seenIds.add(r.id);
+        restaurants.push(r);
+      }
+    }
 
     // 4. Call Claude to generate plan
     const aiPlan = await generatePlan({
