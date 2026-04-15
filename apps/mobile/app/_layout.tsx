@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Stack, useSegments, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { useAuthStore } from '@/stores/auth.store';
 import { usePreferencesStore } from '@/stores/preferences.store';
@@ -59,7 +60,7 @@ export default function RootLayout() {
   if (isLoading) return null;
 
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Stack
         screenOptions={{
           headerShown: false,
@@ -74,6 +75,6 @@ export default function RootLayout() {
         <Stack.Screen name="profile/edit-preferences" options={{ presentation: 'modal' }} />
       </Stack>
       <StatusBar style={themeMode === 'dark' ? 'light' : 'dark'} />
-    </>
+    </GestureHandlerRootView>
   );
 }
