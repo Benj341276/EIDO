@@ -90,6 +90,26 @@ export async function searchByCuisine(
   return filtered;
 }
 
+// Lookup a venue by name to get its Google Maps URL + website
+export async function lookupVenue(
+  venueName: string,
+  lat: number,
+  lng: number,
+): Promise<{ googleMapsUrl: string | null; websiteUrl: string | null } | null> {
+  const key = cacheKey('venue', venueName, lat.toFixed(2), lng.toFixed(2));
+  const cached = cache.get(key);
+  if (cached && cached.expiry > Date.now() && cached.data[0]) {
+    return { googleMapsUrl: cached.data[0].googleMapsUrl, websiteUrl: cached.data[0].websiteUrl };
+  }
+
+  const results = await fetchTextSearch(venueName, lat, lng, 10000);
+  if (results.length === 0) return null;
+
+  const best = results[0];
+  cache.set(key, { data: [best], expiry: Date.now() + CACHE_TTL });
+  return { googleMapsUrl: best.googleMapsUrl, websiteUrl: best.websiteUrl };
+}
+
 // --- Internal fetch functions ---
 
 async function fetchNearby(lat: number, lng: number, radiusMeters: number, types: string[]): Promise<PlaceResult[]> {

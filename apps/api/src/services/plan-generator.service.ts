@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { searchNearby, searchByCuisine, PlaceResult } from './external/google-places.service';
+import { searchNearby, searchByCuisine, lookupVenue, PlaceResult } from './external/google-places.service';
 import { searchEvents, EventResult } from './external/events.service';
 import { generatePlan, GeneratedItem } from './ai/claude.service';
 import { getUserFeedbackSummary, formatFeedbackForPrompt } from './feedback.service';
@@ -170,8 +170,26 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
     for (const a of aiPlan.activities) {
       items.push(enrichItem(a, 'activity', activities, []));
     }
+    // Enrich events: lookup venues on Google Places for Maps/website links
     for (const e of aiPlan.events) {
-      items.push(enrichItem(e, 'event', [], events));
+      const item = enrichItem(e, 'event', [], events);
+      const eventData = events.find((ev) => ev.id === e.external_id);
+
+      // Search venue on Google Places to get fiche Maps + website
+      if (eventData?.venue && eventData.lat && eventData.lng) {
+        const venueInfo = await lookupVenue(eventData.venue, eventData.lat, eventData.lng);
+        if (venueInfo) {
+          if (venueInfo.googleMapsUrl) item.metadata.google_maps_url = venueInfo.googleMapsUrl;
+          if (venueInfo.websiteUrl) item.metadata.website_url = venueInfo.websiteUrl;
+        }
+      }
+
+      // If no ticket URL, generate a search link for booking
+      if (!item.metadata.ticket_url && eventData) {
+        item.metadata.ticket_url = `https://www.google.com/search?q=${encodeURIComponent(`réserver ${eventData.name} billets`)}`;
+      }
+
+      items.push(item);
     }
 
     // 6. Insert plan items
