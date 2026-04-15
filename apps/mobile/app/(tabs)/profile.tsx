@@ -141,20 +141,30 @@ export default function ProfileScreen() {
         {planHistory.length > 0 && (
           <Card style={{ gap: spacing.md }}>
             <Text variant="h3">{t('profile.planHistory') || 'Historique des plans'}</Text>
-            {planHistory.map((plan) => (
+            {planHistory.map((plan, index) => (
               <Pressable
                 key={plan.id}
                 onPress={() => router.push({ pathname: '/plan/results', params: { planId: plan.id } })}
-                style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: spacing.xs }}
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingVertical: spacing.sm,
+                  borderTopWidth: index > 0 ? 1 : 0,
+                  borderTopColor: colors.border,
+                }}
               >
                 <View style={{ flex: 1 }}>
-                  <Text variant="body">{plan.location_name || `${plan.radius_km} km`}</Text>
+                  <Text variant="body" weight="medium">
+                    {plan.location_name || `Plan ${plan.radius_km} km`}
+                  </Text>
                   <Text variant="caption" color={colors.textSecondary}>
-                    {new Date(plan.created_at).toLocaleDateString()}
+                    {new Date(plan.created_at).toLocaleDateString()} à {new Date(plan.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {plan.status === 'completed' ? ' ✓' : plan.status === 'failed' ? ' ✗' : ' ...'}
                   </Text>
                 </View>
                 {plan.total_estimated_cost && (
-                  <Text variant="caption" color={colors.accent}>~{plan.total_estimated_cost}€</Text>
+                  <Text variant="body" color={colors.accent} weight="semibold">~{plan.total_estimated_cost}€</Text>
                 )}
               </Pressable>
             ))}
