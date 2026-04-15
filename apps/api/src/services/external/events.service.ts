@@ -32,10 +32,7 @@ export async function searchEvents(
     if (results.length > 0) return results;
   }
 
-  if (EVENTBRITE_KEY) {
-    return searchEventbrite(lat, lng, radiusKm);
-  }
-
+  // Eventbrite a restreint son API de recherche publique — désactivé
   return [];
 }
 
