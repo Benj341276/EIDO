@@ -87,6 +87,7 @@ export const fr = {
 
   // Explore
   'explore.comingSoon': 'Carte bientôt disponible',
+  'explore.noPlan': "Générez un plan depuis l'accueil pour voir les lieux sur la carte",
 
   // Profile
   'profile.title': 'Profil',

@@ -75,6 +75,7 @@ export const en: Record<string, string> = {
   'plan.visitWebsite': 'Website',
   'plan.costEstimate': 'Estimated budget per person (1 meal, 1 to 2 activities, 1 event)',
   'explore.comingSoon': 'Map coming soon',
+  'explore.noPlan': 'Generate a plan from Home to see places on the map',
 
   'profile.title': 'Profile',
   'profile.notSignedIn': 'Not signed in',

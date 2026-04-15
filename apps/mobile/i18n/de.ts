@@ -75,6 +75,7 @@ export const de: Record<string, string> = {
   'plan.visitWebsite': 'Webseite',
   'plan.costEstimate': 'Geschätztes Budget pro Person (1 Mahlzeit, 1 bis 2 Aktivitäten, 1 Event)',
   'explore.comingSoon': 'Karte bald verfügbar',
+  'explore.noPlan': 'Erstelle einen Plan von Start, um Orte auf der Karte zu sehen',
 
   'profile.title': 'Profil',
   'profile.notSignedIn': 'Nicht angemeldet',
