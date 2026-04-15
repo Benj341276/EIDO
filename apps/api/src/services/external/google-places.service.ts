@@ -27,9 +27,6 @@ const TYPE_MAP: Record<string, string[]> = {
   activity: ['museum', 'art_gallery', 'park', 'gym', 'spa', 'movie_theater', 'bowling_alley', 'amusement_park', 'zoo', 'aquarium', 'stadium', 'tourist_attraction'],
 };
 
-// Types to exclude (shopping centers, generic places)
-const EXCLUDED_TYPES = ['shopping_mall', 'department_store', 'supermarket', 'grocery_or_supermarket', 'convenience_store'];
-
 function cacheKey(...parts: (string | number)[]): string {
   return parts.map(String).join(':');
 }
@@ -183,14 +180,9 @@ function parsePlaces(raw: any[]): PlaceResult[] {
 }
 
 function filterPlaces(places: PlaceResult[]): PlaceResult[] {
-  return places.filter((p) => {
-    // Exclude shopping malls, supermarkets etc.
-    const hasExcluded = p.types.some((t) => EXCLUDED_TYPES.includes(t));
-    if (hasExcluded && !p.types.includes('restaurant')) return false;
-    // Must have a name
-    if (!p.name) return false;
-    return true;
-  });
+  return places
+    .filter((p) => !!p.name)
+    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
 }
 
 function priceLevelToNumber(level: string | undefined): number | null {
