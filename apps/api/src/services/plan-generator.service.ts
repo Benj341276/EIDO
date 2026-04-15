@@ -175,9 +175,14 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
       const item = enrichItem(e, 'event', [], events);
       const eventData = events.find((ev) => ev.id === e.external_id);
 
-      // Search venue on Google Places to get fiche Maps + website
-      if (eventData?.venue && eventData.lat && eventData.lng) {
-        const venueInfo = await lookupVenue(eventData.venue, eventData.lat, eventData.lng);
+      // Search venue on Google Places — only if venue name is a real venue (not artist/event name)
+      const venueName = eventData?.venue;
+      const isRealVenue = venueName
+        && venueName.toLowerCase() !== eventData?.name?.toLowerCase()
+        && venueName.length > 2;
+
+      if (isRealVenue && eventData?.lat && eventData?.lng) {
+        const venueInfo = await lookupVenue(venueName, eventData.lat, eventData.lng);
         if (venueInfo) {
           if (venueInfo.googleMapsUrl) item.metadata.google_maps_url = venueInfo.googleMapsUrl;
           if (venueInfo.websiteUrl) item.metadata.website_url = venueInfo.websiteUrl;

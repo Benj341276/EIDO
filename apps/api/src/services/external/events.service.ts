@@ -77,7 +77,9 @@ async function searchPredictHQ(lat: number, lng: number, radiusKm: number): Prom
         const startDate = e.start ?? '';
         const date = startDate.split('T')[0] ?? '';
         const time = startDate.includes('T') ? startDate.split('T')[1]?.slice(0, 5) : null;
-        const venueName = e.entities?.[0]?.name ?? null;
+        // Extract venue specifically (type "venue"), not performer/artist
+        const venueEntity = (e.entities ?? []).find((ent: any) => ent.type === 'venue');
+        const venueName = venueEntity?.name ?? null;
         const eventLat = e.location?.[1] ?? null;
         const eventLng = e.location?.[0] ?? null;
 
