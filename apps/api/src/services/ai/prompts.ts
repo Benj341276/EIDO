@@ -2,16 +2,29 @@ export const SYSTEM_PROMPT = `Tu es un planificateur de journée expert pour l'a
 Tu génères des recommandations personnalisées basées sur les préférences utilisateur et les données réelles de lieux.
 
 RÈGLES STRICTES :
-- Recommande UNIQUEMENT des restaurants qui correspondent aux cuisines préférées de l'utilisateur. Si l'utilisateur aime la cuisine italienne, ne recommande PAS de restaurant japonais, chinois, etc.
+- Recommande UNIQUEMENT des restaurants qui correspondent aux cuisines préférées de l'utilisateur
+- Respecte STRICTEMENT les restrictions alimentaires
 - Sélectionne un MAXIMUM de résultats : 5-10 restaurants, 5-8 activités, et tous les événements disponibles
 - Priorise les lieux avec les meilleures notes (rating élevé) et les plus proches
-- Respecte STRICTEMENT les restrictions alimentaires
-- Donne un score de pertinence (match_score) entre 0 et 100 pour chaque item
+- Donne un match_score entre 0 et 100 pour chaque item selon ces critères :
+    40% → correspondance cuisine/activité avec les préférences utilisateur
+    30% → rating Google (ex: 4.5/5 = 90 pts)
+    20% → proximité (plus proche = score plus élevé)
+    10% → adéquation avec le budget
 - Estime un coût réaliste par item basé sur le price_level et la localisation
-- Fournis une raison courte et engageante pour chaque recommandation (dans la langue de l'utilisateur)
-- ESTIMATION DU COÛT JOURNÉE : calcule le coût pour une journée RÉALISTE d'une personne = 1 restaurant + 1-2 activités + 1 événement maximum. NE PAS additionner tous les items proposés.
+- Fournis une raison courte et engageante pour chaque recommandation (dans la langue de l'utilisateur), en mentionnant les horaires du jour si pertinent (ex: "Ouvert jusqu'à 23h ce soir")
+- ESTIMATION DU COÛT JOURNÉE : calcule le coût pour une journée RÉALISTE d'une personne = 1 restaurant + 1-2 activités + 1 événement maximum
 - Si peu de données disponibles, recommande ce qu'il y a de mieux plutôt que de forcer des résultats
-- Ne recommande JAMAIS un lieu qui ne correspond pas aux préférences de l'utilisateur`;
+
+RÈGLES SELON LE RYTHME DE VIE :
+- early_bird → priorise les lieux ouverts avant 9h, évite bars/clubs/événements tardifs, plan idéalement terminé avant 21h
+- night_owl → priorise les lieux ouverts après 22h, favorise événements soirée, bars, restaurants avec service tardif
+- flexible → pas de contrainte horaire, mix équilibré
+
+RÈGLES FEEDBACK PASSÉ :
+- Si un lieu a un user_rating <= 2 dans le feedback → ne JAMAIS le recommander
+- Si un lieu a un user_rating >= 4 → priorise les lieux similaires (même type, même ambiance, même gamme de prix)
+- Si aucun feedback disponible → ignore cette règle`;
 
 export const PLAN_TOOL = {
   name: 'generate_plan' as const,
@@ -87,18 +100,22 @@ export function buildUserPrompt(context: {
   location: { lat: number; lng: number };
   radiusKm: number;
   language: string;
+  date: string;
+  time: string;
+  dayOfWeek: string;
 }): string {
-  const { preferences, feedbackSummary, restaurants, activities, events, location, radiusKm, language } = context;
+  const { preferences, feedbackSummary, restaurants, activities, events, location, radiusKm, language, date, time, dayOfWeek } = context;
 
   let prompt = `CONTEXTE UTILISATEUR :
 - Position : ${location.lat}, ${location.lng} (rayon ${radiusKm}km)
+- Date et heure : ${date} ${time} (${dayOfWeek})
 - Cuisines préférées : ${preferences.cuisines?.join(', ') || 'non spécifié'}
 - Genres musicaux : ${preferences.music_genres?.join(', ') || 'non spécifié'}
 - Activités préférées : ${preferences.activities?.join(', ') || 'non spécifié'}
 - Rythme de vie : ${preferences.life_rhythm || 'non spécifié'}
 - Budget : ${preferences.budget_level || 'non spécifié'}
 - Restrictions alimentaires : ${preferences.dietary_restrictions?.join(', ') || 'aucune'}
-- Langue de l'utilisateur : ${language}
+- Langue : ${language}
 
 `;
 
@@ -108,12 +125,12 @@ export function buildUserPrompt(context: {
 
   prompt += `RESTAURANTS DISPONIBLES (${restaurants.length}) :\n`;
   for (const r of restaurants) {
-    prompt += `- [${r.id}] ${r.name} | ${r.address} | Note: ${r.rating ?? '?'}/5 | Prix: ${r.priceLevel ?? '?'}/4 | Types: ${r.types?.join(', ')}\n`;
+    prompt += `- [${r.id}] ${r.name} | ${r.address} | Note: ${r.rating ?? '?'}/5 | Prix: ${r.priceLevel ?? '?'}/4 | Types: ${r.types?.join(', ')} | Ouvert: ${r.openNow === true ? 'oui' : r.openNow === false ? 'non' : '?'} | Horaires: ${r.todayHours ?? 'inconnus'}\n`;
   }
 
   prompt += `\nACTIVITÉS DISPONIBLES (${activities.length}) :\n`;
   for (const a of activities) {
-    prompt += `- [${a.id}] ${a.name} | ${a.address} | Note: ${a.rating ?? '?'}/5 | Types: ${a.types?.join(', ')}\n`;
+    prompt += `- [${a.id}] ${a.name} | ${a.address} | Note: ${a.rating ?? '?'}/5 | Types: ${a.types?.join(', ')} | Ouvert: ${a.openNow === true ? 'oui' : a.openNow === false ? 'non' : '?'} | Horaires: ${a.todayHours ?? 'inconnus'}\n`;
   }
 
   if (events.length > 0) {

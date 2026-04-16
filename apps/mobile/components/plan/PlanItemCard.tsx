@@ -5,6 +5,27 @@ import { useColors } from '@/theme/useColors';
 import { spacing, radii } from '@/theme/spacing';
 import type { PlanItem } from '@/stores/plan.store';
 
+function parseHour(token: string): number {
+  const [hhmm, period] = token.trim().split(' ');
+  let [h] = hhmm.split(':').map(Number);
+  if (period?.toUpperCase() === 'PM' && h < 12) h += 12;
+  if (period?.toUpperCase() === 'AM' && h === 12) h = 0;
+  return h;
+}
+
+// "Lundi: 9:00 – 23:00" → closing "23h" / opening "9h"
+function extractClosingTime(todayHours: string): string | null {
+  const matches = todayHours.match(/\d{1,2}:\d{2}\s*(?:AM|PM)?/gi);
+  if (!matches || matches.length < 2) return null;
+  return `${parseHour(matches[matches.length - 1])}h`;
+}
+
+function extractOpeningTime(todayHours: string): string | null {
+  const matches = todayHours.match(/\d{1,2}:\d{2}\s*(?:AM|PM)?/gi);
+  if (!matches || matches.length === 0) return null;
+  return `${parseHour(matches[0])}h`;
+}
+
 interface Props {
   item: PlanItem;
   onPress: () => void;
@@ -14,6 +35,12 @@ export function PlanItemCard({ item, onPress }: Props) {
   const colors = useColors();
   const eventDate = item.metadata?.event_date || (item.description?.startsWith('📅') ? item.description.slice(2).trim() : null);
   const eventTime = item.metadata?.event_time;
+
+  const openNow: boolean | null = item.metadata?.open_now ?? null;
+  const todayHours: string | null = item.metadata?.today_hours ?? null;
+  const closingTime = openNow === true && todayHours ? extractClosingTime(todayHours) : null;
+  const openingTime = openNow === false && todayHours ? extractOpeningTime(todayHours) : null;
+  const showOpenStatus = item.category !== 'event' && openNow !== null;
 
   return (
     <Pressable onPress={onPress} style={{ width: 220, marginRight: spacing.md }}>
@@ -41,6 +68,15 @@ export function PlanItemCard({ item, onPress }: Props) {
           {/* Venue for events */}
           {item.category === 'event' && item.address && (
             <Text variant="caption" color={colors.textSecondary} numberOfLines={1}>📍 {item.address}</Text>
+          )}
+
+          {/* Open/closed status */}
+          {showOpenStatus && (
+            <Text variant="caption" weight="semibold" style={{ color: openNow ? '#22C55E' : '#EF4444' }}>
+              {openNow
+                ? closingTime ? `Ouvert · ferme à ${closingTime}` : 'Ouvert'
+                : openingTime ? `Fermé · ouvre à ${openingTime}` : 'Fermé en ce moment'}
+            </Text>
           )}
 
           {item.reason && (

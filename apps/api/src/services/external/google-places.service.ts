@@ -18,9 +18,11 @@ export interface PlaceResult {
   photoUrl: string | null;
   googleMapsUrl: string | null;
   websiteUrl: string | null;
+  openNow: boolean | null;
+  todayHours: string | null;
 }
 
-const FIELD_MASK = 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.priceLevel,places.types,places.photos,places.googleMapsUri,places.websiteUri';
+const FIELD_MASK = 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.priceLevel,places.types,places.photos,places.googleMapsUri,places.websiteUri,places.currentOpeningHours';
 
 const TYPE_MAP: Record<string, string[]> = {
   restaurant: ['restaurant'],
@@ -182,21 +184,32 @@ async function fetchTextSearch(query: string, lat: number, lng: number, radiusMe
 }
 
 function parsePlaces(raw: any[]): PlaceResult[] {
-  return raw.map((p) => ({
-    id: p.id,
-    name: p.displayName?.text ?? '',
-    address: p.formattedAddress ?? '',
-    lat: p.location?.latitude ?? 0,
-    lng: p.location?.longitude ?? 0,
-    rating: p.rating ?? null,
-    priceLevel: priceLevelToNumber(p.priceLevel),
-    types: p.types ?? [],
-    photoUrl: p.photos?.[0]?.name
-      ? `https://places.googleapis.com/v1/${p.photos[0].name}/media?key=${API_KEY}&maxWidthPx=400`
-      : null,
-    googleMapsUrl: p.googleMapsUri ?? null,
-    websiteUrl: p.websiteUri ?? null,
-  }));
+  return raw.map((p) => {
+    // Google's weekdayDescriptions: index 0 = Monday … 6 = Sunday
+    // JS getDay(): 0 = Sunday, 1 = Monday … 6 = Saturday
+    const jsDay = new Date().getDay();
+    const googleDayIndex = (jsDay + 6) % 7;
+    const weekdayDescriptions: string[] = p.currentOpeningHours?.weekdayDescriptions ?? [];
+    const todayHours = weekdayDescriptions[googleDayIndex] ?? null;
+
+    return {
+      id: p.id,
+      name: p.displayName?.text ?? '',
+      address: p.formattedAddress ?? '',
+      lat: p.location?.latitude ?? 0,
+      lng: p.location?.longitude ?? 0,
+      rating: p.rating ?? null,
+      priceLevel: priceLevelToNumber(p.priceLevel),
+      types: p.types ?? [],
+      photoUrl: p.photos?.[0]?.name
+        ? `https://places.googleapis.com/v1/${p.photos[0].name}/media?key=${API_KEY}&maxWidthPx=400`
+        : null,
+      googleMapsUrl: p.googleMapsUri ?? null,
+      websiteUrl: p.websiteUri ?? null,
+      openNow: p.currentOpeningHours?.openNow ?? null,
+      todayHours,
+    };
+  });
 }
 
 function filterPlaces(places: PlaceResult[]): PlaceResult[] {

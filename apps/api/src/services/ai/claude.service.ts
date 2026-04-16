@@ -12,6 +12,9 @@ export interface PlanGenerationContext {
   location: { lat: number; lng: number };
   radiusKm: number;
   language: string;
+  date: string;
+  time: string;
+  dayOfWeek: string;
 }
 
 export interface GeneratedPlan {

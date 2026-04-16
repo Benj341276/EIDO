@@ -24,6 +24,10 @@ export default function PlanItemDetailScreen() {
   const priceRange = item.metadata?.price_min != null && item.metadata?.price_max != null
     ? `${item.metadata.price_min}–${item.metadata.price_max}€`
     : null;
+  const openNow: boolean | null = item.metadata?.open_now ?? null;
+  const todayHours: string | null = item.metadata?.today_hours ?? null;
+  // Strip day prefix: "Lundi: 9:00 – 23:00" → "9:00 – 23:00"
+  const hoursDisplay = todayHours ? todayHours.replace(/^[^:]+:\s*/, '') : null;
 
   return (
     <ScreenContainer>
@@ -44,6 +48,15 @@ export default function PlanItemDetailScreen() {
               <Text variant="body" weight="semibold" color={colors.accent}>📅 {eventDate}{eventTime ? ` à ${eventTime}` : ''}</Text>
             </View>
           )}
+
+          {/* Open/closed status — restaurants & activities only */}
+          {item.category !== 'event' && openNow !== null && (
+            <Text variant="body" weight="semibold" style={{ color: openNow ? '#22C55E' : '#EF4444' }}>
+              {openNow ? 'Ouvert en ce moment' : 'Fermé en ce moment'}
+              {hoursDisplay ? `  ·  ${hoursDisplay}` : ''}
+            </Text>
+          )}
+
 
           {venue && <Text variant="body" color={colors.textSecondary}>📍 {venue}</Text>}
           {priceRange && <Text variant="body" color={colors.textSecondary}>💰 {priceRange}</Text>}

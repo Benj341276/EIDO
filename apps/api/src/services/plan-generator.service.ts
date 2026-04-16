@@ -99,6 +99,12 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
     const feedbackText = await getFeedbackPromptText(supabase, userId);
 
     // 5. Call Claude to generate plan
+    const now = new Date();
+    const DAY_NAMES = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    const date = now.toISOString().slice(0, 10);
+    const time = now.toTimeString().slice(0, 5);
+    const dayOfWeek = DAY_NAMES[now.getDay()];
+
     const aiPlan = await generatePlan({
       preferences: prefs ?? {},
       feedbackSummary: feedbackText ?? undefined,
@@ -108,6 +114,9 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
       location: { lat: latitude, lng: longitude },
       radiusKm,
       language,
+      date,
+      time,
+      dayOfWeek,
     });
 
     // 5. Build plan items from AI response + external data
@@ -168,6 +177,9 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
           ...(event?.venue ? { venue: event.venue } : {}),
           ...(event?.priceMin != null ? { price_min: event.priceMin } : {}),
           ...(event?.priceMax != null ? { price_max: event.priceMax } : {}),
+          // Opening hours snapshot (restaurants & activities only)
+          ...(place?.openNow != null ? { open_now: place.openNow } : {}),
+          ...(place?.todayHours ? { today_hours: place.todayHours } : {}),
         },
       };
     }
