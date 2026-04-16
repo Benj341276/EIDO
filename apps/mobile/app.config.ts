@@ -28,6 +28,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     edgeToEdgeEnabled: true,
   },
   web: {
+    bundler: 'metro',
     output: 'static',
     favicon: './assets/images/favicon.png',
   },
