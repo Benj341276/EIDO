@@ -92,6 +92,20 @@ export async function searchByCuisine(
   return filtered;
 }
 
+// Geocode a place by name+address when coordinates are missing from the original result
+export async function geocodePlace(
+  name: string,
+  address: string,
+  nearLat: number,
+  nearLng: number,
+): Promise<{ lat: number; lng: number } | null> {
+  const query = `${name} ${address}`.trim();
+  const results = await fetchTextSearch(query, nearLat, nearLng, 50000);
+  const hit = results.find((r) => r.lat != null && r.lng != null);
+  if (!hit || hit.lat == null || hit.lng == null) return null;
+  return { lat: hit.lat, lng: hit.lng };
+}
+
 // Lookup a venue by name to get its Google Maps URL + website
 export async function lookupVenue(
   venueName: string,

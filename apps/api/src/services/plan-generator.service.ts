@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import type { PlanItem as SharedPlanItem, UserPreferences } from '@eido-life/shared';
-import { searchNearby, searchByCuisine, lookupVenue, PlaceResult } from './external/google-places.service';
+import { searchNearby, searchByCuisine, lookupVenue, geocodePlace, PlaceResult } from './external/google-places.service';
 import { searchEvents, EventResult } from './external/events.service';
 import { generatePlan, GeneratedItem } from './ai/claude.service';
 import { getFeedbackPromptText } from './feedback.service';
@@ -217,7 +217,20 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
       items.push(item);
     }
 
-    // 6. Score items by category to surface the most relevant ones first
+    // 6. Geocode items with missing coordinates (Google Places sometimes omits location)
+    await Promise.all(
+      items
+        .filter((item) => item.latitude == null && item.address)
+        .map(async (item) => {
+          const coords = await geocodePlace(item.name, item.address!, latitude, longitude);
+          if (coords) {
+            item.latitude = coords.lat;
+            item.longitude = coords.lng;
+          }
+        })
+    );
+
+    // 7. Score items by category to surface the most relevant ones first
     if (prefs && items.length > 1) {
       const currentHour = new Date().getHours();
 
