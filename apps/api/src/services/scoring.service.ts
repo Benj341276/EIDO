@@ -40,7 +40,7 @@ function scoreTaste(item: PlanItem, userPrefs: UserPreferences): number {
     if (typeof cuisine !== 'string') return 0.0;
     const normalized = normalizeCuisineKey(cuisine);
     if (userPrefs.cuisines.includes(normalized)) return 1.0;
-    if (userPrefs.cuisines.some((c) => c.includes(normalized) || normalized.includes(c))) return 0.5;
+    if (userPrefs.cuisines.some((c: string) => c.includes(normalized) || normalized.includes(c))) return 0.5;
     return 0.0;
   }
 
@@ -48,7 +48,7 @@ function scoreTaste(item: PlanItem, userPrefs: UserPreferences): number {
   const detail = item.metadata.category_detail;
   const key = typeof detail === 'string' ? detail : item.category;
   if (userPrefs.activities.includes(key)) return 1.0;
-  if (userPrefs.activities.some((a) => a.includes(key) || key.includes(a))) return 0.5;
+  if (userPrefs.activities.some((a: string) => a.includes(key) || key.includes(a))) return 0.5;
   return 0.0;
 }
 
