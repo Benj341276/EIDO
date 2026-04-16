@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Pressable, Linking, Platform } from 'react-native';
-import MapView, { Marker, Circle, Region } from 'react-native-maps';
+import MapView, { Marker, Circle, type Region } from '@/components/MapView';
 import * as Location from 'expo-location';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Text, Button } from '@/components/ui';
@@ -28,7 +28,7 @@ export default function ExploreScreen() {
   const [deviceLocation, setDeviceLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedItem, setSelectedItem] = useState<PlanItem | null>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const mapRef = useRef<MapView>(null);
+  const mapRef = useRef<any>(null);
 
   useEffect(() => {
     (async () => {
