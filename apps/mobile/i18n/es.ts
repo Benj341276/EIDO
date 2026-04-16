@@ -76,6 +76,7 @@ export const es: Record<string, string> = {
   'plan.visitWebsite': 'Sitio web',
   'plan.costEstimate': 'Presupuesto estimado por persona (1 comida, 1 a 2 actividades, 1 evento)',
   'plan.savedInHistory': 'Tu plan ha sido guardado en el historial de tu perfil',
+  'plan.showMore': 'Ver más ({count})',
   'explore.comingSoon': 'Mapa próximamente',
   'explore.noPlan': 'Genera un plan desde Inicio para ver los lugares en el mapa',
 

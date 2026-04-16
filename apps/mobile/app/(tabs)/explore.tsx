@@ -20,7 +20,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function ExploreScreen() {
   const colors = useColors();
   const { t } = useTranslation();
-  const { items, planLocation, planRadiusKm } = usePlanStore();
+  const { items, planLocation, planRadiusKm, revealedCategories } = usePlanStore();
   const preferences = usePreferencesStore((s) => s.preferences);
   const prefsRadiusKm = preferences?.default_radius_km ?? 5;
   const radiusKm = planRadiusKm ?? prefsRadiusKm;
@@ -105,16 +105,18 @@ export default function ExploreScreen() {
           strokeWidth={1}
         />
 
-        {/* Plan item pins */}
-        {items.filter((i) => i.latitude && i.longitude).map((item) => (
-          <Marker
-            key={item.id || item.name}
-            coordinate={{ latitude: item.latitude!, longitude: item.longitude! }}
-            pinColor={CATEGORY_COLORS[item.category] ?? colors.accent}
-            title={item.name}
-            onPress={() => handleMarkerPress(item)}
-          />
-        ))}
+        {/* Plan item pins — only visible items (or revealed via "Voir plus") */}
+        {items
+          .filter((i) => i.latitude && i.longitude && (i.is_visible !== false || revealedCategories.includes(i.category)))
+          .map((item) => (
+            <Marker
+              key={item.id || item.name}
+              coordinate={{ latitude: item.latitude!, longitude: item.longitude! }}
+              pinColor={CATEGORY_COLORS[item.category] ?? colors.accent}
+              title={item.name}
+              onPress={() => handleMarkerPress(item)}
+            />
+          ))}
       </MapView>
 
       {/* Legend */}

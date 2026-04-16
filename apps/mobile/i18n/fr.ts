@@ -86,6 +86,7 @@ export const fr = {
   'plan.visitWebsite': 'Site web',
   'plan.costEstimate': 'Budget estimé par personne (1 repas, 1 à 2 activités, 1 événement)',
   'plan.savedInHistory': "Votre plan est sauvegardé dans l'historique de votre profil",
+  'plan.showMore': 'Voir plus ({count})',
 
   // Explore
   'explore.comingSoon': 'Carte bientôt disponible',

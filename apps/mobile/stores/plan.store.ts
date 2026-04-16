@@ -20,6 +20,7 @@ export interface PlanItem {
   external_url: string | null;
   metadata: Record<string, any> | null;
   sort_order: number;
+  is_visible: boolean;
 }
 
 interface PlanState {
@@ -30,9 +31,11 @@ interface PlanState {
   planRadiusKm: number | null;
   isGenerating: boolean;
   error: string | null;
+  revealedCategories: string[];
 
   generatePlan: (lat: number, lng: number, radiusKm: number, language: string, locationName?: string) => Promise<void>;
   setActivePlan: (items: PlanItem[], location: { lat: number; lng: number }, radiusKm: number) => void;
+  revealCategory: (category: string) => void;
   clear: () => void;
 }
 
@@ -44,6 +47,7 @@ export const usePlanStore = create<PlanState>((set) => ({
   planRadiusKm: null,
   isGenerating: false,
   error: null,
+  revealedCategories: [],
 
   generatePlan: async (lat, lng, radiusKm, language, locationName) => {
     set({ isGenerating: true, items: [], planId: null, totalCost: null, error: null });
@@ -87,6 +91,7 @@ export const usePlanStore = create<PlanState>((set) => ({
         planLocation: { lat, lng },
         planRadiusKm: radiusKm,
         isGenerating: false,
+        revealedCategories: [],
       });
     } catch (err: any) {
       set({ error: err.message ?? 'Generation failed', isGenerating: false });
@@ -94,10 +99,18 @@ export const usePlanStore = create<PlanState>((set) => ({
   },
 
   setActivePlan: (items, location, radiusKm) => {
-    set({ items, planLocation: location, planRadiusKm: radiusKm });
+    set({ items, planLocation: location, planRadiusKm: radiusKm, revealedCategories: [] });
+  },
+
+  revealCategory: (category) => {
+    set((state) => ({
+      revealedCategories: state.revealedCategories.includes(category)
+        ? state.revealedCategories
+        : [...state.revealedCategories, category],
+    }));
   },
 
   clear: () => {
-    set({ planId: null, items: [], totalCost: null, planLocation: null, planRadiusKm: null, isGenerating: false, error: null });
+    set({ planId: null, items: [], totalCost: null, planLocation: null, planRadiusKm: null, isGenerating: false, error: null, revealedCategories: [] });
   },
 }));

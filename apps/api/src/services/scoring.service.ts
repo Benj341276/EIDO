@@ -25,14 +25,22 @@ function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number)
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+// Strips Google Places suffixes: "italian_restaurant" → "italian", "pizza_place" → "pizza"
+function normalizeCuisineKey(raw: string): string {
+  return raw.replace(/_restaurant$/, '').replace(/_place$/, '').replace(/_cafe$/, '');
+}
+
 function scoreTaste(item: PlanItem, userPrefs: UserPreferences): number {
   if (item.category === 'event') return 0.5;
 
   if (item.category === 'restaurant') {
     const cuisine = item.metadata.cuisine;
+    // TODO: remove — temporary cuisine debug
+    console.log(`[TASTE] ${item.name} | metadata.cuisine=${JSON.stringify(cuisine)} | userPrefs.cuisines=${JSON.stringify(userPrefs.cuisines)}`);
     if (typeof cuisine !== 'string') return 0.0;
-    if (userPrefs.cuisines.includes(cuisine)) return 1.0;
-    if (userPrefs.cuisines.some((c) => c.includes(cuisine) || cuisine.includes(c))) return 0.5;
+    const normalized = normalizeCuisineKey(cuisine);
+    if (userPrefs.cuisines.includes(normalized)) return 1.0;
+    if (userPrefs.cuisines.some((c) => c.includes(normalized) || normalized.includes(c))) return 0.5;
     return 0.0;
   }
 
@@ -138,7 +146,7 @@ export function scorePlanItems(
   // TODO: integrate weather-based score adjustments in a future iteration
   _weather?: { isRaining: boolean; tempCelsius: number },
 ): ScoredItem[] {
-  return items
+  const scored = items
     .map((item) => {
       const taste = scoreTaste(item, userPrefs);
       const distance = scoreDistance(item, userPrefs, userLat, userLng);
@@ -150,5 +158,12 @@ export function scorePlanItems(
       return { item, score, breakdown: { taste, distance, budget, rating, timing } };
     })
     .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
+    .slice(0, 7);
+
+  // TODO: remove — temporary scoring debug
+  for (const { item, score, breakdown } of scored) {
+    console.log(`[SCORING] ${item.name} (${item.category}) → ${score.toFixed(2)}`, breakdown);
+  }
+
+  return scored;
 }

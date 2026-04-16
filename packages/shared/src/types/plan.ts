@@ -41,6 +41,7 @@ export interface PlanItem {
   external_source: string | null;
   metadata: Record<string, unknown>;
   sort_order: number;
+  is_visible: boolean;
   created_at: string;
 }
 

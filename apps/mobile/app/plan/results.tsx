@@ -11,7 +11,21 @@ import { useTranslation } from '@/i18n';
 import { useColors } from '@/theme/useColors';
 import { spacing } from '@/theme/spacing';
 
-function CategorySection({ title, items, onItemPress }: { title: string; items: PlanItem[]; onItemPress: (item: PlanItem) => void }) {
+function CategorySection({
+  title,
+  items,
+  hiddenCount,
+  onReveal,
+  onItemPress,
+}: {
+  title: string;
+  items: PlanItem[];
+  hiddenCount: number;
+  onReveal: () => void;
+  onItemPress: (item: PlanItem) => void;
+}) {
+  const colors = useColors();
+  const { t } = useTranslation();
   if (items.length === 0) return null;
   return (
     <View style={{ gap: spacing.sm }}>
@@ -24,6 +38,13 @@ function CategorySection({ title, items, onItemPress }: { title: string; items: 
         contentContainerStyle={{ paddingHorizontal: spacing.lg }}
         showsHorizontalScrollIndicator={false}
       />
+      {hiddenCount > 0 && (
+        <Pressable onPress={onReveal} style={{ paddingHorizontal: spacing.lg, paddingVertical: spacing.xs }}>
+          <Text variant="body" color={colors.accent}>
+            {t('plan.showMore').replace('{count}', String(hiddenCount))}
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -72,12 +93,21 @@ export default function PlanResultsScreen() {
   const totalCost = isFromHistory ? historyCost : storeState.totalCost;
   const isLoading = isFromHistory ? loadingHistory : storeState.isGenerating;
   const error = isFromHistory ? null : storeState.error;
+  const { revealedCategories, revealCategory } = storeState;
 
   if (isLoading) return <PlanLoading />;
 
-  const restaurants = items.filter((i) => i.category === 'restaurant');
-  const activities = items.filter((i) => i.category === 'activity');
-  const events = items.filter((i) => i.category === 'event');
+  function splitCategory(category: string) {
+    const all = items.filter((i) => i.category === category);
+    const revealed = revealedCategories.includes(category);
+    const visible = revealed ? all : all.filter((i) => i.is_visible !== false);
+    const hiddenCount = revealed ? 0 : all.filter((i) => i.is_visible === false).length;
+    return { visible, hiddenCount };
+  }
+
+  const { visible: restaurants, hiddenCount: hiddenRestaurants } = splitCategory('restaurant');
+  const { visible: activities, hiddenCount: hiddenActivities } = splitCategory('activity');
+  const { visible: events, hiddenCount: hiddenEvents } = splitCategory('event');
 
   function handleItemPress(item: PlanItem) {
     router.push({ pathname: '/plan/item/[itemId]', params: { itemId: item.id, itemData: JSON.stringify(item) } });
@@ -113,9 +143,27 @@ export default function PlanResultsScreen() {
           </Text>
         )}
 
-        <CategorySection title={t('editPrefs.cuisines')} items={restaurants} onItemPress={handleItemPress} />
-        <CategorySection title={t('editPrefs.activities')} items={activities} onItemPress={handleItemPress} />
-        <CategorySection title={t('plan.events')} items={events} onItemPress={handleItemPress} />
+        <CategorySection
+          title={t('editPrefs.cuisines')}
+          items={restaurants}
+          hiddenCount={hiddenRestaurants}
+          onReveal={() => revealCategory('restaurant')}
+          onItemPress={handleItemPress}
+        />
+        <CategorySection
+          title={t('editPrefs.activities')}
+          items={activities}
+          hiddenCount={hiddenActivities}
+          onReveal={() => revealCategory('activity')}
+          onItemPress={handleItemPress}
+        />
+        <CategorySection
+          title={t('plan.events')}
+          items={events}
+          hiddenCount={hiddenEvents}
+          onReveal={() => revealCategory('event')}
+          onItemPress={handleItemPress}
+        />
       </View>
     </ScreenContainer>
   );

@@ -40,6 +40,7 @@ export interface PlanItemResult {
   external_id: string | null;
   metadata: Record<string, any>;
   sort_order: number;
+  is_visible: boolean;
 }
 
 export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanResult> {
@@ -146,7 +147,13 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
         external_url: place?.googleMapsUrl ?? null,
         external_id: aiItem.external_id,
         sort_order: sortOrder++,
+        is_visible: false, // overridden after scoring
         metadata: {
+          // Cuisine: first Google Places type that ends with _restaurant or _place
+          // e.g. ["italian_restaurant", "restaurant"] → cuisine: "italian_restaurant"
+          ...(category === 'restaurant' && place?.types?.length
+            ? { cuisine: place.types.find((t) => t !== 'restaurant' && t !== 'food' && t !== 'point_of_interest' && t !== 'establishment') ?? place.types[0] }
+            : {}),
           // Google Maps link (for places or generated for events)
           ...(place?.googleMapsUrl ? { google_maps_url: place.googleMapsUrl } : {}),
           ...(!place?.googleMapsUrl && (event?.venue || event?.lat) ? {
@@ -243,10 +250,18 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
 
       let order = 0;
       items.splice(0, items.length,
-        ...restaurants.map((i) => ({ ...i, sort_order: order++ })),
-        ...activities.map((i) => ({ ...i, sort_order: order++ })),
-        ...events.map((i) => ({ ...i, sort_order: order++ })),
+        ...restaurants.map((i, idx) => ({ ...i, sort_order: order++, is_visible: idx < 3 })),
+        ...activities.map((i, idx) => ({ ...i, sort_order: order++, is_visible: idx < 3 })),
+        ...events.map((i, idx) => ({ ...i, sort_order: order++, is_visible: idx < 3 })),
       );
+    } else {
+      // No prefs or single item — mark first 3 of each category visible
+      const countByCategory: Record<string, number> = {};
+      for (const item of items) {
+        const n = countByCategory[item.category] ?? 0;
+        item.is_visible = n < 3;
+        countByCategory[item.category] = n + 1;
+      }
     }
 
     // 7. Insert plan items
@@ -270,6 +285,7 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
           description: item.description,
           metadata: item.metadata,
           sort_order: item.sort_order,
+          is_visible: item.is_visible,
         }))
       );
       if (itemsError) console.error('[PlanGenerator] Insert items error:', itemsError);
