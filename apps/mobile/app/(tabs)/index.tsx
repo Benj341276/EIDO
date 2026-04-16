@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Pressable, Image } from 'react-native';
+import { View, Pressable, Image, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
@@ -32,22 +32,32 @@ export default function HomeScreen() {
   }, []);
   const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: pulse.value }] }));
 
-  // Get location
+  // On mount: check existing permission without prompting
   useEffect(() => {
     (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setLocationError(t('home.locationDenied') || 'Location access denied');
-        return;
+      const { status } = await Location.getForegroundPermissionsAsync();
+      if (status === 'granted') {
+        const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        setLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
       }
-      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      setLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+      // If not determined or denied, stay silent — error shown only after CTA tap
     })();
   }, []);
 
   async function handleGenerate() {
-    if (!location) return;
-    await generatePlan(location.lat, location.lng, radius, language);
+    // Request permission if not yet granted
+    if (!location) {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setLocationError(t('home.locationDenied'));
+        return;
+      }
+      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      setLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+      await generatePlan(loc.coords.latitude, loc.coords.longitude, radius, language);
+    } else {
+      await generatePlan(location.lat, location.lng, radius, language);
+    }
     if (!usePlanStore.getState().error) {
       router.push('/plan/results');
     }
@@ -64,7 +74,7 @@ export default function HomeScreen() {
         <Animated.View style={pulseStyle}>
           <Pressable
             onPress={handleGenerate}
-            disabled={isGenerating || !location}
+            disabled={isGenerating}
             style={{
               width: 160,
               height: 160,
@@ -72,7 +82,7 @@ export default function HomeScreen() {
               backgroundColor: isGenerating ? colors.surface : colors.accent,
               justifyContent: 'center',
               alignItems: 'center',
-              opacity: !location ? 0.5 : 1,
+              opacity: 1,
               shadowColor: colors.accent,
               shadowOffset: { width: 0, height: 0 },
               shadowOpacity: 0.4,
@@ -87,7 +97,10 @@ export default function HomeScreen() {
         </Animated.View>
 
         {locationError ? (
-          <Text variant="caption" color={colors.error} style={{ marginTop: spacing.md }}>{locationError}</Text>
+          <Pressable onPress={() => Linking.openSettings()} style={{ marginTop: spacing.md, alignItems: 'center', gap: 4 }}>
+            <Text variant="caption" color={colors.error}>{locationError}</Text>
+            <Text variant="caption" color={colors.accent}>Ouvrir les Réglages →</Text>
+          </Pressable>
         ) : null}
 
         {usePlanStore.getState().error ? (
