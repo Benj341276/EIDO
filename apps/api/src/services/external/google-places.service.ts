@@ -10,8 +10,8 @@ export interface PlaceResult {
   id: string;
   name: string;
   address: string;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   rating: number | null;
   priceLevel: number | null;
   types: string[];
@@ -196,8 +196,8 @@ function parsePlaces(raw: any[]): PlaceResult[] {
       id: p.id,
       name: p.displayName?.text ?? '',
       address: p.formattedAddress ?? '',
-      lat: p.location?.latitude ?? 0,
-      lng: p.location?.longitude ?? 0,
+      lat: p.location?.latitude ?? null,
+      lng: p.location?.longitude ?? null,
       rating: p.rating ?? null,
       priceLevel: priceLevelToNumber(p.priceLevel),
       types: p.types ?? [],
