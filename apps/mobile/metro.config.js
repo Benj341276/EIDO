@@ -19,4 +19,8 @@ config.resolver.nodeModulesPaths = [
 config.resolver.unstable_enableSymlinks = true;
 config.resolver.unstable_enablePackageExports = true;
 
+// Prefer browser-compatible builds to avoid import.meta in non-module scripts
+// (fixes Supabase/isows import.meta SyntaxError on web)
+config.resolver.conditionNames = ['require', 'default', 'browser'];
+
 module.exports = config;
