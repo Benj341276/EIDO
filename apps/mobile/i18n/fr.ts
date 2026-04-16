@@ -88,6 +88,16 @@ export const fr = {
   'plan.savedInHistory': "Votre plan est sauvegardé dans l'historique de votre profil",
   'plan.showMore': 'Voir plus ({count})',
 
+  // Rate Visit
+  'rateVisit.title': 'Note ta visite',
+  'rateVisit.subtitle': 'Appuie sur les étoiles des lieux que tu as visités',
+  'rateVisit.submit': 'Envoyer',
+  'rateVisit.skip': 'Passer',
+  'rateVisit.noItems': 'Aucun lieu à noter.',
+
+  // Notification
+  'notification.body': 'Tu as visité des lieux aujourd\'hui ? Donne ton avis ⭐',
+
   // Explore
   'explore.comingSoon': 'Carte bientôt disponible',
   'explore.noPlan': "Générez un plan depuis l'accueil pour voir les lieux sur la carte",
@@ -101,6 +111,7 @@ export const fr = {
   'profile.language': 'Langue',
   'profile.editPreferences': 'Modifier mes préférences',
   'profile.planHistory': 'Historique des plans',
+  'profile.notifications': 'Notifications',
 
   // Edit Preferences
   'editPrefs.title': 'Modifier mes préférences',

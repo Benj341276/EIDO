@@ -31,7 +31,8 @@ export interface PlanItem {
   description: string | null;
   address: string | null;
   location: GeoPoint | null;
-  rating: number | null;
+  rating: number | null;        // Note Google Places (lecture seule)
+  user_rating: number | null;  // Note laissée par l'utilisateur après visite (1-5)
   price_level: 1 | 2 | 3 | 4 | null;
   estimated_cost: number | null;
   duration_minutes: number | null;

@@ -3,7 +3,7 @@ import type { PlanItem as SharedPlanItem, UserPreferences } from '@eido-life/sha
 import { searchNearby, searchByCuisine, lookupVenue, PlaceResult } from './external/google-places.service';
 import { searchEvents, EventResult } from './external/events.service';
 import { generatePlan, GeneratedItem } from './ai/claude.service';
-import { getUserFeedbackSummary, formatFeedbackForPrompt } from './feedback.service';
+import { getFeedbackPromptText } from './feedback.service';
 import { scorePlanItems } from './scoring.service';
 
 interface GeneratePlanInput {
@@ -96,13 +96,12 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
     }
 
     // 4. Get feedback summary for personalization
-    const feedbackSummary = await getUserFeedbackSummary(supabase, userId);
-    const feedbackText = feedbackSummary ? formatFeedbackForPrompt(feedbackSummary) : undefined;
+    const feedbackText = await getFeedbackPromptText(supabase, userId);
 
     // 5. Call Claude to generate plan
     const aiPlan = await generatePlan({
       preferences: prefs ?? {},
-      feedbackSummary: feedbackText,
+      feedbackSummary: feedbackText ?? undefined,
       restaurants,
       activities,
       events,

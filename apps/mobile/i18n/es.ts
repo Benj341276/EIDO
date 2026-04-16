@@ -77,6 +77,14 @@ export const es: Record<string, string> = {
   'plan.costEstimate': 'Presupuesto estimado por persona (1 comida, 1 a 2 actividades, 1 evento)',
   'plan.savedInHistory': 'Tu plan ha sido guardado en el historial de tu perfil',
   'plan.showMore': 'Ver más ({count})',
+
+  'rateVisit.title': 'Valora tu visita',
+  'rateVisit.subtitle': 'Toca las estrellas de los lugares que visitaste',
+  'rateVisit.submit': 'Enviar',
+  'rateVisit.skip': 'Omitir',
+  'rateVisit.noItems': 'No hay lugares para valorar.',
+
+  'notification.body': '¿Visitaste algunos lugares hoy? Comparte tu experiencia ⭐',
   'explore.comingSoon': 'Mapa próximamente',
   'explore.noPlan': 'Genera un plan desde Inicio para ver los lugares en el mapa',
 
@@ -88,6 +96,7 @@ export const es: Record<string, string> = {
   'profile.language': 'Idioma',
   'profile.editPreferences': 'Editar mis preferencias',
   'profile.planHistory': 'Historial de planes',
+  'profile.notifications': 'Notificaciones',
 
   'editPrefs.title': 'Editar mis preferencias',
   'editPrefs.cuisines': 'Cocinas',

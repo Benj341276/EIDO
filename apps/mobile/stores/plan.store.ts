@@ -13,6 +13,7 @@ export interface PlanItem {
   latitude: number | null;
   longitude: number | null;
   rating: number | null;
+  user_rating: number | null;
   price_level: number | null;
   estimated_cost: number | null;
   duration_minutes: number | null;

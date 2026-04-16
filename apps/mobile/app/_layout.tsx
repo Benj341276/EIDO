@@ -2,12 +2,22 @@ import { useEffect, useRef } from 'react';
 import { Stack, useSegments, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import * as Notifications from 'expo-notifications';
 import 'react-native-reanimated';
 import { useAuthStore } from '@/stores/auth.store';
 import { usePreferencesStore } from '@/stores/preferences.store';
 import { useThemeStore } from '@/stores/theme.store';
 import { useLanguageStore } from '@/stores/language.store';
 import { useColors } from '@/theme/useColors';
+
+// Display notifications when app is in foreground
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function RootLayout() {
   const colors = useColors();
@@ -30,8 +40,20 @@ export default function RootLayout() {
   useEffect(() => {
     if (isAuthenticated) {
       loadPreferences();
+      Notifications.requestPermissionsAsync();
     }
   }, [isAuthenticated]);
+
+  // Navigate to RateVisit when user taps a notification
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener((response: Notifications.NotificationResponse) => {
+      const planId = response.notification.request.content.data?.planId as string | undefined;
+      if (planId) {
+        router.push({ pathname: '/plan/rate-visit', params: { planId } });
+      }
+    });
+    return () => subscription.remove();
+  }, []);
 
   const isLoading = !langHydrated || authLoading || (isAuthenticated && prefsLoading);
 
@@ -71,6 +93,7 @@ export default function RootLayout() {
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="plan/results" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="plan/rate-visit" options={{ presentation: 'modal' }} />
         <Stack.Screen name="plan/item/[itemId]" options={{ presentation: 'modal' }} />
         <Stack.Screen name="profile/edit-preferences" options={{ presentation: 'modal' }} />
       </Stack>

@@ -49,6 +49,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           'EIDO Life uses your location to find nearby places and events.',
       },
     ],
+    [
+      'expo-notifications',
+      {
+        color: '#2D7FF9',
+        sounds: [],
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,

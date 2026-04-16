@@ -14,6 +14,7 @@ export interface UserPreferences {
   default_radius_km: number;
   dietary_restrictions: string[];
   onboarding_completed: boolean;
+  notifications_enabled: boolean;
   created_at: string;
   updated_at: string;
 }

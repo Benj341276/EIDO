@@ -77,6 +77,14 @@ export const en: Record<string, string> = {
   'plan.costEstimate': 'Estimated budget per person (1 meal, 1 to 2 activities, 1 event)',
   'plan.savedInHistory': 'Your plan has been saved to your profile history',
   'plan.showMore': 'See more ({count})',
+
+  'rateVisit.title': 'Rate your visit',
+  'rateVisit.subtitle': 'Tap the stars for the places you visited',
+  'rateVisit.submit': 'Send',
+  'rateVisit.skip': 'Skip',
+  'rateVisit.noItems': 'No places to rate.',
+
+  'notification.body': 'Did you visit some places today? Share your experience ⭐',
   'explore.comingSoon': 'Map coming soon',
   'explore.noPlan': 'Generate a plan from Home to see places on the map',
 
@@ -88,6 +96,7 @@ export const en: Record<string, string> = {
   'profile.language': 'Language',
   'profile.editPreferences': 'Edit my preferences',
   'profile.planHistory': 'Plan history',
+  'profile.notifications': 'Notifications',
 
   'editPrefs.title': 'Edit my preferences',
   'editPrefs.cuisines': 'Cuisines',

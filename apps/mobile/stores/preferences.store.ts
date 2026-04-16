@@ -37,6 +37,7 @@ interface PreferencesState {
   loadDraftFromPreferences: () => void;
   submitPreferences: () => Promise<{ error?: string }>;
   updatePreferences: () => Promise<{ error?: string }>;
+  setNotificationsEnabled: (value: boolean) => Promise<void>;
 }
 
 export const usePreferencesStore = create<PreferencesState>((set, get) => ({
@@ -129,5 +130,20 @@ export const usePreferencesStore = create<PreferencesState>((set, get) => ({
 
     await get().loadPreferences();
     return {};
+  },
+
+  setNotificationsEnabled: async (value) => {
+    const userId = useAuthStore.getState().user?.id;
+    if (!userId) return;
+
+    // Optimistic update
+    set((state) => ({
+      preferences: state.preferences ? { ...state.preferences, notifications_enabled: value } : null,
+    }));
+
+    await getSupabase()
+      .from('user_preferences')
+      .update({ notifications_enabled: value })
+      .eq('user_id', userId);
   },
 }));

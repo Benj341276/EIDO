@@ -21,7 +21,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { user, signOut } = useAuthStore();
-  const { preferences } = usePreferencesStore();
+  const { preferences, setNotificationsEnabled } = usePreferencesStore();
   const { mode, toggleMode } = useThemeStore();
   const { language, setLanguage } = useLanguageStore();
 
@@ -58,6 +58,33 @@ export default function ProfileScreen() {
           </View>
           <Pressable onPress={toggleMode} style={{ width: 50, height: 28, borderRadius: 14, backgroundColor: mode === 'dark' ? colors.accent : colors.border, justifyContent: 'center', paddingHorizontal: 2 }}>
             <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: colors.white, alignSelf: mode === 'dark' ? 'flex-end' : 'flex-start' }} />
+          </Pressable>
+        </Card>
+
+        {/* Notifications toggle */}
+        <Card style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+            <Ionicons name="notifications-outline" size={20} color={colors.accent} />
+            <Text weight="medium">{t('profile.notifications')}</Text>
+          </View>
+          <Pressable
+            onPress={() => setNotificationsEnabled(!(preferences?.notifications_enabled ?? true))}
+            style={{
+              width: 50,
+              height: 28,
+              borderRadius: 14,
+              backgroundColor: (preferences?.notifications_enabled ?? true) ? colors.accent : colors.border,
+              justifyContent: 'center',
+              paddingHorizontal: 2,
+            }}
+          >
+            <View style={{
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              backgroundColor: colors.white,
+              alignSelf: (preferences?.notifications_enabled ?? true) ? 'flex-end' : 'flex-start',
+            }} />
           </Pressable>
         </Card>
 

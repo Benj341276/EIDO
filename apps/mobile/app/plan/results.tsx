@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, FlatList, Pressable } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import * as Notifications from 'expo-notifications';
 import { Text, ScreenContainer } from '@/components/ui';
 import { PlanLoading } from '@/components/plan/PlanLoading';
 import { PlanItemCard } from '@/components/plan/PlanItemCard';
 import { CostBadge } from '@/components/plan/CostBadge';
 import { usePlanStore, PlanItem } from '@/stores/plan.store';
+import { usePreferencesStore } from '@/stores/preferences.store';
 import { getSupabase } from '@/lib/supabase';
 import { useTranslation } from '@/i18n';
 import { useColors } from '@/theme/useColors';
@@ -55,12 +57,47 @@ export default function PlanResultsScreen() {
   const { t } = useTranslation();
   const { planId: paramPlanId } = useLocalSearchParams<{ planId?: string }>();
   const storeState = usePlanStore();
+  const preferences = usePreferencesStore((s) => s.preferences);
 
   const [historyItems, setHistoryItems] = useState<PlanItem[]>([]);
   const [historyCost, setHistoryCost] = useState<{ min: number; max: number; currency: string } | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const notifScheduled = useRef(false);
 
   const isFromHistory = !!paramPlanId;
+
+  // Schedule post-visit rating notification after a new plan is generated
+  useEffect(() => {
+    if (isFromHistory || notifScheduled.current) return;
+    if (storeState.isGenerating || !storeState.planId) return;
+    if (preferences?.notifications_enabled === false) return;
+
+    notifScheduled.current = true;
+
+    const now = new Date();
+    const fireAt = new Date(now);
+    // Before 14:00 → same day at 20:00 / after 14:00 → next day at 20:00
+    if (now.getHours() < 14) {
+      fireAt.setHours(20, 0, 0, 0);
+    } else {
+      fireAt.setDate(fireAt.getDate() + 1);
+      fireAt.setHours(20, 0, 0, 0);
+    }
+
+    const secondsUntil = Math.max(60, Math.floor((fireAt.getTime() - Date.now()) / 1000));
+
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'EIDO Life',
+        body: t('notification.body'),
+        data: { planId: storeState.planId },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: secondsUntil,
+      },
+    }).catch(() => {});
+  }, [storeState.isGenerating, storeState.planId, isFromHistory, preferences?.notifications_enabled]);
 
   useEffect(() => {
     if (!paramPlanId) return;

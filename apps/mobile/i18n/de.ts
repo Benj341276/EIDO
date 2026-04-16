@@ -77,6 +77,14 @@ export const de: Record<string, string> = {
   'plan.costEstimate': 'Geschätztes Budget pro Person (1 Mahlzeit, 1 bis 2 Aktivitäten, 1 Event)',
   'plan.savedInHistory': 'Dein Plan wurde in deinem Profilverlauf gespeichert',
   'plan.showMore': 'Mehr anzeigen ({count})',
+
+  'rateVisit.title': 'Bewerte deinen Besuch',
+  'rateVisit.subtitle': 'Tippe auf die Sterne der Orte, die du besucht hast',
+  'rateVisit.submit': 'Senden',
+  'rateVisit.skip': 'Überspringen',
+  'rateVisit.noItems': 'Keine Orte zu bewerten.',
+
+  'notification.body': 'Hast du heute Orte besucht? Teile deine Erfahrung ⭐',
   'explore.comingSoon': 'Karte bald verfügbar',
   'explore.noPlan': 'Erstelle einen Plan von Start, um Orte auf der Karte zu sehen',
 
@@ -88,6 +96,7 @@ export const de: Record<string, string> = {
   'profile.language': 'Sprache',
   'profile.editPreferences': 'Meine Präferenzen bearbeiten',
   'profile.planHistory': 'Planverlauf',
+  'profile.notifications': 'Benachrichtigungen',
 
   'editPrefs.title': 'Meine Präferenzen bearbeiten',
   'editPrefs.cuisines': 'Küchen',
