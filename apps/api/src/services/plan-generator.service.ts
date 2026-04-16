@@ -1,8 +1,10 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import type { PlanItem as SharedPlanItem, UserPreferences } from '@eido-life/shared';
 import { searchNearby, searchByCuisine, lookupVenue, PlaceResult } from './external/google-places.service';
 import { searchEvents, EventResult } from './external/events.service';
 import { generatePlan, GeneratedItem } from './ai/claude.service';
 import { getUserFeedbackSummary, formatFeedbackForPrompt } from './feedback.service';
+import { scorePlanItems } from './scoring.service';
 
 interface GeneratePlanInput {
   userId: string;
@@ -197,7 +199,57 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
       items.push(item);
     }
 
-    // 6. Insert plan items
+    // 6. Score items by category to surface the most relevant ones first
+    if (prefs && items.length > 1) {
+      const currentHour = new Date().getHours();
+
+      function toSharedItem(item: PlanItemResult): SharedPlanItem {
+        return {
+          id: item.id || '',
+          plan_id: '',
+          category: item.category as SharedPlanItem['category'],
+          name: item.name,
+          description: item.description,
+          address: item.address,
+          location: item.latitude != null && item.longitude != null
+            ? { lat: item.latitude, lng: item.longitude }
+            : null,
+          rating: item.rating,
+          price_level: item.price_level as 1 | 2 | 3 | 4 | null,
+          estimated_cost: item.estimated_cost,
+          duration_minutes: item.duration_minutes,
+          image_url: item.image_url,
+          external_url: item.external_url,
+          external_id: item.external_id || null,
+          external_source: null,
+          metadata: item.metadata ?? {},
+          sort_order: item.sort_order,
+          created_at: '',
+        };
+      }
+
+      function scoreCategory(categoryItems: PlanItemResult[]): PlanItemResult[] {
+        if (categoryItems.length <= 1) return categoryItems;
+        const forScoring = categoryItems.map(toSharedItem);
+        const scored = scorePlanItems(forScoring, prefs as UserPreferences, latitude, longitude, currentHour);
+        return scored
+          .map((s) => categoryItems[forScoring.indexOf(s.item)])
+          .filter(Boolean) as PlanItemResult[];
+      }
+
+      const restaurants = scoreCategory(items.filter((i) => i.category === 'restaurant'));
+      const activities = scoreCategory(items.filter((i) => i.category === 'activity'));
+      const events = scoreCategory(items.filter((i) => i.category === 'event'));
+
+      let order = 0;
+      items.splice(0, items.length,
+        ...restaurants.map((i) => ({ ...i, sort_order: order++ })),
+        ...activities.map((i) => ({ ...i, sort_order: order++ })),
+        ...events.map((i) => ({ ...i, sort_order: order++ })),
+      );
+    }
+
+    // 7. Insert plan items
     if (items.length > 0) {
       const { error: itemsError } = await supabase.from('plan_items').insert(
         items.map((item) => ({
@@ -223,14 +275,14 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
       if (itemsError) console.error('[PlanGenerator] Insert items error:', itemsError);
     }
 
-    // 7. Update plan status
+    // 8. Update plan status
     const totalCost = aiPlan.day_cost_estimate;
     await supabase
       .from('plans')
       .update({ status: 'completed', total_estimated_cost: totalCost.max })
       .eq('id', planId);
 
-    // 8. Re-fetch items with IDs
+    // 9. Re-fetch items with IDs
     const { data: savedItems } = await supabase
       .from('plan_items')
       .select('*')

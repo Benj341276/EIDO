@@ -3,6 +3,7 @@ export const fr = {
   'common.next': 'Suivant',
   'common.save': 'Enregistrer',
   'common.cancel': 'Annuler',
+  'common.back': 'Retour',
   'common.signOut': 'Se déconnecter',
   'common.modify': 'Modifier',
 
@@ -84,6 +85,7 @@ export const fr = {
   'plan.bookTickets': 'Réserver',
   'plan.visitWebsite': 'Site web',
   'plan.costEstimate': 'Budget estimé par personne (1 repas, 1 à 2 activités, 1 événement)',
+  'plan.savedInHistory': "Votre plan est sauvegardé dans l'historique de votre profil",
 
   // Explore
   'explore.comingSoon': 'Carte bientôt disponible',

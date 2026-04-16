@@ -35,7 +35,6 @@ export default function PlanResultsScreen() {
   const { planId: paramPlanId } = useLocalSearchParams<{ planId?: string }>();
   const storeState = usePlanStore();
 
-  // If coming from history, load plan from DB
   const [historyItems, setHistoryItems] = useState<PlanItem[]>([]);
   const [historyCost, setHistoryCost] = useState<{ min: number; max: number; currency: string } | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
@@ -55,6 +54,12 @@ export default function PlanResultsScreen() {
       if (plan) {
         const sorted = (plan.plan_items ?? []).sort((a: any, b: any) => a.sort_order - b.sort_order);
         setHistoryItems(sorted);
+
+        // Sync plan store so the Explorer tab reflects this plan
+        if (plan.latitude != null && plan.longitude != null) {
+          storeState.setActivePlan(sorted, { lat: plan.latitude, lng: plan.longitude }, plan.radius_km);
+        }
+
         if (plan.total_estimated_cost) {
           setHistoryCost({ min: Math.round(plan.total_estimated_cost * 0.6), max: plan.total_estimated_cost, currency: 'EUR' });
         }
@@ -81,11 +86,21 @@ export default function PlanResultsScreen() {
   return (
     <ScreenContainer>
       <View style={{ gap: spacing.lg }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text variant="h2">{t('plan.yourPlan') || 'Votre plan'}</Text>
-          <Pressable onPress={() => router.back()}>
-            <Text variant="body" color={colors.accent}>{t('common.cancel') || 'Retour'}</Text>
+        {/* Header */}
+        <View style={{ gap: spacing.xs }}>
+          <Pressable
+            onPress={() => router.back()}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
+          >
+            <Text variant="body" color={colors.accent}>←</Text>
+            <Text variant="body" color={colors.accent}>{t('common.back')}</Text>
           </Pressable>
+          <Text variant="h2">{t('plan.yourPlan')}</Text>
+          {!isFromHistory && (
+            <Text variant="caption" color={colors.textSecondary}>
+              {t('plan.savedInHistory')}
+            </Text>
+          )}
         </View>
 
         {totalCost && <CostBadge min={totalCost.min} max={totalCost.max} currency={totalCost.currency} />}
@@ -94,13 +109,13 @@ export default function PlanResultsScreen() {
 
         {items.length === 0 && !error && (
           <Text variant="body" color={colors.textSecondary} align="center" style={{ marginTop: spacing['2xl'] }}>
-            {t('plan.noResults') || 'Aucun résultat trouvé. Essayez un rayon plus grand.'}
+            {t('plan.noResults')}
           </Text>
         )}
 
-        <CategorySection title={t('editPrefs.cuisines') || 'Restaurants'} items={restaurants} onItemPress={handleItemPress} />
-        <CategorySection title={t('editPrefs.activities') || 'Activités'} items={activities} onItemPress={handleItemPress} />
-        <CategorySection title={t('plan.events') || 'Événements'} items={events} onItemPress={handleItemPress} />
+        <CategorySection title={t('editPrefs.cuisines')} items={restaurants} onItemPress={handleItemPress} />
+        <CategorySection title={t('editPrefs.activities')} items={activities} onItemPress={handleItemPress} />
+        <CategorySection title={t('plan.events')} items={events} onItemPress={handleItemPress} />
       </View>
     </ScreenContainer>
   );

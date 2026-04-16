@@ -26,10 +26,13 @@ interface PlanState {
   planId: string | null;
   items: PlanItem[];
   totalCost: { min: number; max: number; currency: string } | null;
+  planLocation: { lat: number; lng: number } | null;
+  planRadiusKm: number | null;
   isGenerating: boolean;
   error: string | null;
 
   generatePlan: (lat: number, lng: number, radiusKm: number, language: string, locationName?: string) => Promise<void>;
+  setActivePlan: (items: PlanItem[], location: { lat: number; lng: number }, radiusKm: number) => void;
   clear: () => void;
 }
 
@@ -37,6 +40,8 @@ export const usePlanStore = create<PlanState>((set) => ({
   planId: null,
   items: [],
   totalCost: null,
+  planLocation: null,
+  planRadiusKm: null,
   isGenerating: false,
   error: null,
 
@@ -79,6 +84,8 @@ export const usePlanStore = create<PlanState>((set) => ({
         planId: data.plan_id,
         items: data.items ?? [],
         totalCost: data.total_cost,
+        planLocation: { lat, lng },
+        planRadiusKm: radiusKm,
         isGenerating: false,
       });
     } catch (err: any) {
@@ -86,7 +93,11 @@ export const usePlanStore = create<PlanState>((set) => ({
     }
   },
 
+  setActivePlan: (items, location, radiusKm) => {
+    set({ items, planLocation: location, planRadiusKm: radiusKm });
+  },
+
   clear: () => {
-    set({ planId: null, items: [], totalCost: null, isGenerating: false, error: null });
+    set({ planId: null, items: [], totalCost: null, planLocation: null, planRadiusKm: null, isGenerating: false, error: null });
   },
 }));

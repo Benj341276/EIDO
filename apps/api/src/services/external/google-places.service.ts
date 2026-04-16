@@ -159,7 +159,7 @@ async function fetchTextSearch(query: string, lat: number, lng: number, radiusMe
       body: JSON.stringify({
         textQuery: query,
         maxResultCount: 20,
-        locationRestriction: {
+        locationBias: {
           circle: {
             center: { latitude: lat, longitude: lng },
             radius: radiusMeters,
@@ -169,7 +169,7 @@ async function fetchTextSearch(query: string, lat: number, lng: number, radiusMe
     });
 
     if (!res.ok) {
-      console.error('[GooglePlaces] Text search error:', res.status);
+      console.error('[GooglePlaces] Text search error:', res.status, await res.text());
       return [];
     }
 

@@ -2,6 +2,7 @@ export const es: Record<string, string> = {
   'common.next': 'Siguiente',
   'common.save': 'Guardar',
   'common.cancel': 'Cancelar',
+  'common.back': 'Volver',
   'common.signOut': 'Cerrar sesión',
   'common.modify': 'Editar',
 
@@ -74,6 +75,7 @@ export const es: Record<string, string> = {
   'plan.bookTickets': 'Reservar',
   'plan.visitWebsite': 'Sitio web',
   'plan.costEstimate': 'Presupuesto estimado por persona (1 comida, 1 a 2 actividades, 1 evento)',
+  'plan.savedInHistory': 'Tu plan ha sido guardado en el historial de tu perfil',
   'explore.comingSoon': 'Mapa próximamente',
   'explore.noPlan': 'Genera un plan desde Inicio para ver los lugares en el mapa',
 

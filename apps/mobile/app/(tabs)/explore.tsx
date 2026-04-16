@@ -20,22 +20,38 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function ExploreScreen() {
   const colors = useColors();
   const { t } = useTranslation();
-  const { items } = usePlanStore();
+  const { items, planLocation, planRadiusKm } = usePlanStore();
   const preferences = usePreferencesStore((s) => s.preferences);
-  const radiusKm = preferences?.default_radius_km ?? 5;
+  const prefsRadiusKm = preferences?.default_radius_km ?? 5;
+  const radiusKm = planRadiusKm ?? prefsRadiusKm;
 
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [deviceLocation, setDeviceLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedItem, setSelectedItem] = useState<PlanItem | null>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') return;
       const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      setLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+      setDeviceLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
     })();
   }, []);
+
+  // Animate map when plan location changes (e.g. plan loaded from history)
+  useEffect(() => {
+    if (!planLocation) return;
+    mapRef.current?.animateToRegion(
+      {
+        latitude: planLocation.lat,
+        longitude: planLocation.lng,
+        latitudeDelta: radiusKm * 0.018,
+        longitudeDelta: radiusKm * 0.018,
+      },
+      500,
+    );
+  }, [planLocation, radiusKm]);
 
   const handleMarkerPress = useCallback((item: PlanItem) => {
     setSelectedItem(item);
@@ -53,17 +69,20 @@ export default function ExploreScreen() {
     Linking.openURL(url);
   }
 
-  if (!location) {
+  // Use plan location if available (history plan), otherwise fall back to device GPS
+  const mapCenter = planLocation ?? deviceLocation;
+
+  if (!mapCenter) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
-        <Text variant="body" color={colors.textSecondary}>{t('home.searching') || 'Localisation...'}</Text>
+        <Text variant="body" color={colors.textSecondary}>{t('home.searching')}</Text>
       </View>
     );
   }
 
   const initialRegion: Region = {
-    latitude: location.lat,
-    longitude: location.lng,
+    latitude: mapCenter.lat,
+    longitude: mapCenter.lng,
     latitudeDelta: radiusKm * 0.018,
     longitudeDelta: radiusKm * 0.018,
   };
@@ -71,6 +90,7 @@ export default function ExploreScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <MapView
+        ref={mapRef}
         style={{ flex: 1 }}
         initialRegion={initialRegion}
         showsUserLocation
@@ -78,7 +98,7 @@ export default function ExploreScreen() {
       >
         {/* Radius circle */}
         <Circle
-          center={{ latitude: location.lat, longitude: location.lng }}
+          center={{ latitude: mapCenter.lat, longitude: mapCenter.lng }}
           radius={radiusKm * 1000}
           strokeColor="rgba(45, 127, 249, 0.3)"
           fillColor="rgba(45, 127, 249, 0.08)"
@@ -101,15 +121,15 @@ export default function ExploreScreen() {
       <View style={{ position: 'absolute', top: 60, left: spacing.md, backgroundColor: colors.surface + 'E0', borderRadius: radii.md, padding: spacing.sm, gap: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
           <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#FF6B6B' }} />
-          <Text variant="label">{t('editPrefs.cuisines') || 'Restaurants'}</Text>
+          <Text variant="label">{t('editPrefs.cuisines')}</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
           <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#4ECDC4' }} />
-          <Text variant="label">{t('editPrefs.activities') || 'Activités'}</Text>
+          <Text variant="label">{t('editPrefs.activities')}</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
           <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: '#FFD93D' }} />
-          <Text variant="label">{t('plan.events') || 'Événements'}</Text>
+          <Text variant="label">{t('plan.events')}</Text>
         </View>
       </View>
 
@@ -117,7 +137,7 @@ export default function ExploreScreen() {
       {items.length === 0 && (
         <View style={{ position: 'absolute', bottom: 100, left: spacing.lg, right: spacing.lg, backgroundColor: colors.surface, borderRadius: radii.lg, padding: spacing.md, alignItems: 'center' }}>
           <Text variant="body" color={colors.textSecondary} align="center">
-            {t('explore.noPlan') || 'Générez un plan depuis l\'accueil pour voir les lieux sur la carte'}
+            {t('explore.noPlan')}
           </Text>
         </View>
       )}
@@ -150,7 +170,7 @@ export default function ExploreScreen() {
               <View style={{ flexDirection: 'row', gap: spacing.sm }}>
                 <View style={{ flex: 1 }}>
                   <Button
-                    title={t('plan.openInMaps') || 'Google Maps'}
+                    title={t('plan.openInMaps')}
                     onPress={() => {
                       const url = selectedItem.metadata?.google_maps_url ?? selectedItem.external_url;
                       if (url) Linking.openURL(url);

@@ -2,6 +2,7 @@ export const en: Record<string, string> = {
   'common.next': 'Next',
   'common.save': 'Save',
   'common.cancel': 'Cancel',
+  'common.back': 'Back',
   'common.signOut': 'Sign Out',
   'common.modify': 'Edit',
 
@@ -74,6 +75,7 @@ export const en: Record<string, string> = {
   'plan.bookTickets': 'Book tickets',
   'plan.visitWebsite': 'Website',
   'plan.costEstimate': 'Estimated budget per person (1 meal, 1 to 2 activities, 1 event)',
+  'plan.savedInHistory': 'Your plan has been saved to your profile history',
   'explore.comingSoon': 'Map coming soon',
   'explore.noPlan': 'Generate a plan from Home to see places on the map',
 
