@@ -18,6 +18,7 @@ const basePrefs: UserPreferences = {
   default_radius_km: 5,
   dietary_restrictions: [],
   onboarding_completed: true,
+  notifications_enabled: true,
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
 };
@@ -41,6 +42,8 @@ function makePlanItem(overrides: Partial<PlanItem>): PlanItem {
     external_source: null,
     metadata: {},
     sort_order: 0,
+    is_visible: true,
+    user_rating: null,
     created_at: '2024-01-01T00:00:00Z',
     ...overrides,
   };

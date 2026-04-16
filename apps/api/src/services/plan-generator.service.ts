@@ -242,6 +242,8 @@ export async function generateUserPlan(input: GeneratePlanInput): Promise<PlanRe
           external_source: null,
           metadata: item.metadata ?? {},
           sort_order: item.sort_order,
+          is_visible: false,
+          user_rating: null,
           created_at: '',
         };
       }
