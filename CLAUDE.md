@@ -59,6 +59,34 @@ supabase/        → Migrations SQL, seeds, config
 - Permissions `expo-location` : configurer `NSLocationWhenInUseUsageDescription` (iOS) et `ACCESS_FINE_LOCATION` + `ACCESS_COARSE_LOCATION` (Android) dans `app.config.ts`
 - `.npmrc` : `node-linker=hoisted` et `shamefully-hoist=true` (requis pour Metro + pnpm)
 
+### i18n
+- Detection automatique de la langue du telephone via `expo-localization`
+- Langues supportees : FR (defaut), EN, ES, DE
+- Traductions dans `apps/mobile/i18n/` (fichier plat par langue)
+- Hook `useTranslation()` retourne `t(key)` + `language`
+- Categories stockees en cles anglaises en DB, affichees traduites via `labelFn`
+- Changeable par l'utilisateur dans Profil
+
+## Business model (prevu pour phases 7+)
+
+4 sources de revenus a implementer apres le core product :
+1. **Freemium** : 3 generations de plan gratuites/mois, paywall ensuite
+2. **Abonnement Premium** : 2-3 euros/mois via In-App Purchase, nombre de CTA illimite (ou X/mois configurable depuis l'admin)
+3. **Affiliation** : commission sur clics/reservations via l'app (partenaires marchands)
+4. **Publicite** : ads natives ou contenus sponsorises
+
+Hooks a prevoir dans l'architecture :
+- Compteur de plans generes par mois (user)
+- Flag `is_premium` + `premium_expires_at` sur le profil
+- Limite CTA configurable : free=3/mois, premium=illimite (ou X/mois via admin)
+- Tracking clics sur les items (external_url)
+- Flag `is_partner` + `affiliate_url` sur les items
+
+Admin dashboard prevu en Phase 10 (app web separee, meme Supabase) :
+- Metriques utilisateurs (nombre, sessions, clics)
+- Gestion partenaires (activer/desactiver liens d'affiliation)
+- Analytics revenus
+
 ## Commandes
 
 ```bash
