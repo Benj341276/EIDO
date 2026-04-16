@@ -97,10 +97,18 @@ export default function HomeScreen() {
         </Animated.View>
 
         {locationError ? (
-          <Pressable onPress={() => Linking.openSettings()} style={{ marginTop: spacing.md, alignItems: 'center', gap: 4 }}>
+          <View style={{ marginTop: spacing.md, alignItems: 'center', gap: 4 }}>
             <Text variant="caption" color={colors.error}>{locationError}</Text>
-            <Text variant="caption" color={colors.accent}>Ouvrir les Réglages →</Text>
-          </Pressable>
+            {typeof window !== 'undefined' ? (
+              <Text variant="caption" color={colors.textSecondary} align="center">
+                Autorisez la localisation dans les réglages de votre navigateur
+              </Text>
+            ) : (
+              <Pressable onPress={() => Linking.openSettings()}>
+                <Text variant="caption" color={colors.accent}>Ouvrir les Réglages →</Text>
+              </Pressable>
+            )}
+          </View>
         ) : null}
 
         {usePlanStore.getState().error ? (
