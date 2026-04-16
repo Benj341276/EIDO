@@ -28,7 +28,8 @@ export const useLanguageStore = create<LanguageState>()(
   persist(
     (set) => ({
       language: detectDeviceLanguage(),
-      _hydrated: false,
+      // On web, localStorage is synchronous — consider hydrated immediately
+      _hydrated: Platform.OS === 'web',
       setLanguage: (language) => set({ language }),
     }),
     {
