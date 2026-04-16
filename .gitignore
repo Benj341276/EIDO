@@ -1,6 +1,7 @@
 node_modules/
 .expo/
 dist/
+!apps/mobile/dist/
 *.tsbuildinfo
 .env
 .env.local
@@ -10,3 +11,5 @@ ios/
 android/
 coverage/
 .DS_Store
+.vercel
+.env*.local
