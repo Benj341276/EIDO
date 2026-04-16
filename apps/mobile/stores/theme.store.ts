@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+
+const storage = createJSONStorage(() =>
+  Platform.OS === 'web' ? localStorage : AsyncStorage
+);
 
 type ThemeMode = 'dark' | 'light';
 
@@ -17,7 +22,7 @@ export const useThemeStore = create<ThemeState>()(
     }),
     {
       name: 'eido-theme',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage,
     }
   )
 );

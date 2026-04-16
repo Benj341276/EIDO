@@ -1,7 +1,12 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import { getLocales } from 'expo-localization';
+
+const storage = createJSONStorage(() =>
+  Platform.OS === 'web' ? localStorage : AsyncStorage
+);
 
 export type Language = 'fr' | 'en' | 'es' | 'de';
 
@@ -28,7 +33,7 @@ export const useLanguageStore = create<LanguageState>()(
     }),
     {
       name: 'eido-language',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage,
       onRehydrateStorage: () => (state) => {
         // If persisted value is null (legacy) or missing, use device language
         if (!state?.language) {
