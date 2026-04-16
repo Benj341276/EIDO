@@ -1,5 +1,5 @@
 {
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "buildCommand": "npx expo export --platform web",
+  "buildCommand": "cd ../.. && pnpm --filter @eido-life/shared build && cd apps/mobile && npx expo export --platform web",
   "outputDirectory": "dist"
 }
